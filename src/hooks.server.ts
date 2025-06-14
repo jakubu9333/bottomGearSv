@@ -1,7 +1,6 @@
 
 import { validateSessionToken } from '$lib/server/auth';
 import { redirect, type Handle } from '@sveltejs/kit';
-export { BottomGearObject } from '$lib/server/durrable';
 
 const freeUrls = [
     "/login",
