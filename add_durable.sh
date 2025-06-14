@@ -2,4 +2,4 @@
 
 
 dir=.svelte-kit/cloudflare
-printf "export { default } from './src/lib/server/durrable/index.ts;'\n" >> $dir/_worker.js
+printf "export { BottomGearObject } from './src/lib/server/durrable/index.ts;'\n" >> $dir/_worker.js
