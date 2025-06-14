@@ -14,6 +14,10 @@
 		"lint": "prettier --check .",
 		"db:push": "drizzle-kit push",
 		"db:migrate": "drizzle-kit migrate",
+		"db:generate": "drizzle-kit generate ",
+		"db:dev:generate": "drizzle-kit generate --config=drizzle-dev.config.ts",
+		"db:dev:migrate": "drizzle-kit migrate --config=drizzle-dev.config.ts",
+		"db:dev:studio": "drizzle-kit studio --config=drizzle-dev.config.ts",
 		"db:studio": "drizzle-kit studio",
 		"deploy": "bun run build && wrangler deploy",
 		"cf-typegen": "wrangler types ./src/worker-configuration.d.ts"
@@ -24,6 +28,7 @@
 		"@sveltejs/vite-plugin-svelte": "^5.0.0",
 		"@tailwindcss/vite": "^4.0.0",
 		"@types/node": "^20",
+		"daisyui": "^5.0.43",
 		"drizzle-kit": "^0.30.2",
 		"prettier": "^3.4.2",
 		"prettier-plugin-svelte": "^3.3.3",
