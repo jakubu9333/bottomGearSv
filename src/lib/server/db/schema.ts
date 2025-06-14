@@ -7,7 +7,7 @@ export const user = sqliteTable('user', {
 	roomId: integer("room_id").references(() => room.id)
 });
 
-export const room = sqliteTable('user', {
+export const room = sqliteTable('room', {
 	id: integer('id').primaryKey(),
 	name: text().notNull(),
 });
