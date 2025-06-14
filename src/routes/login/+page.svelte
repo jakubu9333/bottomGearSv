@@ -1,71 +1,60 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 </script>
 
-<div
-	class="flex min-h-screen items-center justify-center bg-gradient-to-br from-pink-100 to-purple-100 px-4"
->
-	<div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl">
+<div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
+	<div class="rounded-box bg-base-100 w-full max-w-md p-8 shadow-2xl">
 		<h1 class="mb-6 text-center text-3xl font-bold">👑 Vstúp do Bottom Gearu</h1>
 
 		<!-- Prihlasovací formulár -->
-		<form class="space-y-4" method="POST">
-			<label class="block">
-				<span class="text-sm font-medium text-gray-700">Tvoje prihlasovacie meno</span>
+		<form class="flex flex-col space-y-4" method="POST" use:enhance>
+			<label class="form-control w-full">
+				<div class="label">
+					<span class="label-text">Tvoje prihlasovacie meno</span>
+				</div>
 				<input
 					type="text"
 					placeholder="Prihlasovacie meno"
-					class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-pink-400 focus:outline-none"
+					class="input input-bordered w-full"
 					required
 					name="username"
 				/>
 			</label>
 
-			<label class="block">
-				<span class="text-sm font-medium text-gray-700">Meno roomky</span>
+			<label class="form-control w-full">
+				<div class="label">
+					<span class="label-text">Meno roomky</span>
+				</div>
 				<input
 					type="text"
 					placeholder="Meno roomky"
-					class="mt-1 w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-pink-400 focus:outline-none"
+					class="input input-bordered w-full"
 					required
 					name="room"
 				/>
 			</label>
 
-			<button
-				type="submit"
-				class="w-full cursor-pointer rounded-lg bg-pink-500 px-4 py-2 font-semibold text-white hover:bg-pink-600"
-			>
-				Prihlásiť sa
-			</button>
+			<button type="submit" class="btn btn-primary w-full">Prihlásiť sa</button>
 		</form>
 
 		<!-- Oddelovač -->
-		<div class="my-6 flex items-center justify-center gap-4 text-gray-400">
-			<hr class="flex-grow border-t border-gray-300" />
-			<span class="text-sm">alebo</span>
-			<hr class="flex-grow border-t border-gray-300" />
-		</div>
+		<div class="divider text-sm">alebo</div>
 
 		<!-- Google OAuth (voliteľne) -->
-
-		<a href="/login/google">
-			<button
-				class="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border border-gray-300 py-2 hover:bg-gray-50"
-			>
+		<a href="/login/google" class="w-full">
+			<button class="btn btn-outline flex w-full items-center justify-center gap-2">
 				<img
 					src="https://www.svgrepo.com/show/475656/google-color.svg"
 					alt="Google"
 					class="h-5 w-5"
-					height="20"
-					width="20"
 				/>
 				<span>Prihlásiť sa cez Google</span>
 			</button>
 		</a>
 
 		<!-- Info text -->
-		<p class="mt-6 text-center text-xs text-gray-500">
-			Pokial nepoužijes google tento účet bude dostupný len na tomto zariadení.<br />
+		<p class="text-base-content/60 mt-6 text-center text-xs">
+			Pokial nepoužijes Google, tento účet bude dostupný len na tomto zariadení.
 		</p>
 	</div>
 </div>
