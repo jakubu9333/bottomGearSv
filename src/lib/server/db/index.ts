@@ -1,10 +1,11 @@
-import { drizzle } from 'drizzle-orm/libsql';
-import { createClient } from '@libsql/client';
-import * as schema from './schema';
-import { env } from '$env/dynamic/private';
+import { drizzle } from 'drizzle-orm/d1';
+import { drizzle as bunDrizzle } from 'drizzle-orm/bun-sqlite';
+import { dev } from '$app/environment';
 
-if (!env.DATABASE_URL) throw new Error('DATABASE_URL is not set');
+export const db = (env: Env) => {
+	if (dev) {
+		return bunDrizzle(process.env.DATABASE_NAME)
+	}
 
-const client = createClient({ url: env.DATABASE_URL });
-
-export const db = drizzle(client, { schema });
+	return drizzle(env.BOTTOM_GEAR_DB)
+};

@@ -13,7 +13,39 @@
 	},
 	"observability": {
 		"enabled": true
-	}
+	},
+	 "d1_databases": [
+		{
+			"binding": "BOTTOM_GEAR_DB",
+			"database_name": "bottomgeardb",
+			"database_id": "73ae1bad-9b8b-4a88-a528-a4618f397e83",
+			"migrations_dir": "drizzle/migrations"
+		}
+	],
+	"kv_namespaces": [
+		{
+		"binding": "BOTTOM_GEAR_SESSIONS",
+		"id": "dd785637f8eb4fa7b0f274624cdb8110"
+		}
+	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "BOTTOM_GEAR_DURRABLE_OBJECT",
+				"class_name": "BottomGearObject"
+			}
+		]
+	},
+	   
+        "migrations": [
+		{
+			"tag": "v1",
+			"new_classes": [
+				"BottomGearObject"
+			]
+		}
+	]
+
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement
