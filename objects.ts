@@ -1,7 +1,7 @@
-export class BottomGearObject extends DurableObject {
+
+export class BottomGearObject {
 	constructor(ctx, env) {
 		// Required, as we're extending the base class.
-		super(ctx, env);
 	}
 }
 
