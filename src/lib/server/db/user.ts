@@ -7,15 +7,15 @@ export const getUser = async (env: Env, userId: number) => {
 }
 
 export const getUserByGoogleId = async (env: Env, googleId: string) => {
-	return (await db(env).select().from(user).where(eq(user.googleID, googleId)))[0]
+	return (await db(env).select().from(user).where(eq(user.googleId, googleId)))[0]
 }
 
-export const createUser = async (env: Env, userName: string) => {
-	return (await db(env).insert(user).values({ name: userName }).returning())[0]
+export const createUser = async (env: Env, userName: string, roomId: number) => {
+	return (await db(env).insert(user).values({ name: userName, roomId }).returning())[0]
 }
 
 export const createUserWithGoogleId = async (env: Env, googleId: string, userName: string) => {
-	return (await db(env).insert(user).values({ name: userName, googleID: googleId }).returning())[0]
+	return (await db(env).insert(user).values({ name: userName, googleId }).returning())[0]
 }
 
 export const changeName = async (env: Env, userId: number, username: string) => {
