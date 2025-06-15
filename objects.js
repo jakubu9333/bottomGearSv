@@ -1,7 +1,7 @@
 
 export class BottomGearObject {
-	env: any;
-	ctx: any;
+	env
+	ctx
 	constructor(ctx, env) {
 		this.ctx = ctx
 		this.env = env
