@@ -1,8 +1,7 @@
 
 import { validateSessionToken } from '$lib/server/auth';
 import { getUser } from '$lib/server/db/user';
-import { redirect, type Handle } from '@sveltejs/kit';
-import { fail } from 'assert';
+import { fail, redirect, type Handle } from '@sveltejs/kit';
 
 const freeUrls = [
     "/login",
@@ -25,7 +24,9 @@ export const handle: Handle = async ({ event, resolve }) => {
     if (!userId && !isFreeUrl) {
         return redirect(303, "/login")
     }
-    const isAdminUrl = event.url.pathname.startsWith("/admin")
+    const isAdminUrl = event.url.pathname.startsWith("/admin") && event.url.pathname !== "/"
+
+
     if (isAdminUrl) {
         if (!userId) {
             return redirect(303, "/login")

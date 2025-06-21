@@ -63,7 +63,7 @@ export async function GET(event: RequestEvent): Promise<Response> {
     return new Response(null, {
         status: 303,
         headers: {
-            Location: "/username"
+            Location: "/"
         }
     });
 }

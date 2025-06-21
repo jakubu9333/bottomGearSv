@@ -2,5 +2,5 @@
 
 
 dir=.svelte-kit/cloudflare
-cat ./objects.js >> $dir/_worker.js
+cat ./src/objects.js >> $dir/_worker.js
 

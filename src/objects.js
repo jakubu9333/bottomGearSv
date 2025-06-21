@@ -1,10 +1,9 @@
+import { DurableObject } from "cloudflare:workers";
 
-export class BottomGearObject {
-	env
-	ctx
+export class BottomGearObject extends DurableObject {
+
 	constructor(ctx, env) {
-		this.ctx = ctx
-		this.env = env
+		super(ctx, env)
 	}
 	async fetch(request) {
 		// Creates two ends of a WebSocket connection.
@@ -16,7 +15,7 @@ export class BottomGearObject {
 		// and allowing the WebSocket to send and receive messages.
 		// Unlike `ws.accept()`, `state.acceptWebSocket(ws)` informs the Workers Runtime that the WebSocket
 		// is "hibernatable", so the runtime does not need to pin this Durable Object to memory while
-		// the connection is open. During periods of inactivity, the Durable Object can be evicted
+		// the connection is open. During periods of i  nactivity, the Durable Object can be evicted
 		// from memory, but the WebSocket connection will remain open. If at some later point the
 		// WebSocket receives a message, the runtime will recreate the Durable Object
 		// (run the `constructor`) and deliver the message to the appropriate handler.
@@ -40,6 +39,15 @@ export class BottomGearObject {
 	async webSocketClose(ws, code, reason, wasClean) {
 		// If the client closes the connection, the runtime will invoke the webSocketClose() handler.
 		ws.close(code, "Durable Object is closing WebSocket");
+	}
+
+	async joinRoom(name) {
+		for (const socket of this.ctx.getWebSockets()) {
+			console.log(`joining ${socket}`)
+			socket.send(JSON.stringify({ type: "join", user: name }))
+		}
+		return `XXX ${name}`
+
 	}
 }
 

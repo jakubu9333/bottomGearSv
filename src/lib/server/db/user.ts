@@ -3,15 +3,23 @@ import { user } from "./schema"
 import { eq } from "drizzle-orm"
 
 export const getUser = async (env: Env, userId: number) => {
-	return (await db(env).select({ id: user.id, name: user.name }).from(user).where(eq(user.id, userId)))[0]
+	return (await db(env).select({ id: user.id, name: user.name, isAdmin: user.isAdmin }).from(user).where(eq(user.id, userId)))[0]
 }
 
 export const getUserByGoogleId = async (env: Env, googleId: string) => {
 	return (await db(env).select().from(user).where(eq(user.googleId, googleId)))[0]
 }
 
+export const getUsersByRoomId = async (env: Env, roomId: string) => {
+	return (await db(env).select().from(user).where(eq(user.roomId, +roomId)))
+}
+
 export const createUser = async (env: Env, userName: string, roomId: number) => {
 	return (await db(env).insert(user).values({ name: userName, roomId }).returning())[0]
+}
+
+export const createUserAdmin = async (env: Env, userName: string, roomId: number) => {
+	return (await db(env).insert(user).values({ name: userName, roomId, isAdmin: 1 }).returning())[0]
 }
 
 export const createUserWithGoogleId = async (env: Env, googleId: string, userName: string) => {

@@ -8,7 +8,7 @@ export const user = sqliteTable('user', {
 	isAdmin: integer("is_admin").notNull().default(0) // 0 - false , 1 - true
 });
 
-export const room = sqliteTable('user', {
+export const room = sqliteTable('room', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	name: text().notNull(),
 });
