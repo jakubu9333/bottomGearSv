@@ -24,6 +24,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     if (!userId && !isFreeUrl) {
         return redirect(303, "/login")
     }
+
     const isAdminUrl = event.url.pathname.startsWith("/admin") && event.url.pathname !== "/"
 
 

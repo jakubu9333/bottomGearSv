@@ -3,7 +3,7 @@
 
 	let { data }: PageProps = $props();
 	const user = data.user;
-	const isAdmin = user.isAdmin;
+	const isAdmin = user?.isAdmin??false;
 </script>
 
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { PageProps } from '../$types';
+	import { enhance } from '$app/forms';
 	let { data }: PageProps = $props();
 
 	let users: { name: string }[] = $state(data.users);
@@ -33,6 +34,9 @@
 		<h1 class="mb-6 text-center text-3xl font-bold">
 			Ludia v roomke {room.name}
 		</h1>
+		<form method="post" use:enhance>
+			<button class="btn btn-primary my-2 w-full">Zacni prvy duel</button>
+		</form>
 
 		<ul class="space-y-2">
 			{#each users as person}
