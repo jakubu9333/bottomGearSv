@@ -3,12 +3,13 @@
 	import MoneyInput from './MoneyInput.svelte';
 	let {
 		money = $bindable(),
-		userId,
 		betItemToShow = $bindable(),
-		makeBetState
+		makeBetState,
+		roomId
 	}: {
 		money: number;
 		userId: number;
+		roomId: number;
 		betItemToShow: { name: string; money: number };
 		makeBetState: () => void;
 	} = $props();
@@ -16,10 +17,10 @@
 	let duel: {
 		value: null | Duel;
 	} = $state({ value: null });
-	type Duel = { id: number; nameFirst: string; nameSecond: string };
+	type Duel = { id: number; firstName: string; secondName: string };
 
 	async function getDuel(): Promise<Duel | null> {
-		const response = await fetch('/me/duel');
+		const response = await fetch(`/room/${roomId}/duel`);
 		if (response.status !== 200) {
 			return null;
 		}
@@ -36,23 +37,22 @@
 	});
 	let errorLook = $state(false);
 
-	async function duelBet(winner: number) {
-		if (duel.value === null) {
+	async function duelBet(winner: string | undefined) {
+		if (duel.value === null || winner === undefined) {
 			return;
 		}
 		errorLook = false;
-		/* const { data, error } = await actions.makeDuelBet({
-			winner,
-			userId,
-			money: moneyToBet,
-			duelId: duel.value.id
-		});
-		if (error) {
+		const betResponse = await fetch('/me/bet', { method: 'post',body:{
+			duelId: duel.value.id,
+			winner
+			money : moneyToBet
+			
+		} });
+		if (betResponse.status >= 300) {
 			errorLook = true;
 			return;
 		}
-        */
-		const bettedFor = winner === 1 ? duel.value.nameFirst : duel.value.nameSecond;
+		const bettedFor = winner;
 		betItemToShow.name = bettedFor;
 		betItemToShow.money = moneyToBet;
 		money -= moneyToBet;
@@ -70,10 +70,18 @@
 {/if}
 <MoneyInput {money} bind:moneyToBet />
 <div class="mt-4 flex flex-col gap-4">
-	<button class="btn btn-primary" disabled={!duel.value} onclick={() => duelBet(1)}>
-		{duel.value?.nameFirst ?? ''}
+	<button
+		class="btn btn-primary"
+		disabled={!duel.value}
+		onclick={() => duelBet(duel.value?.firstName)}
+	>
+		{duel.value?.firstName ?? ''}
 	</button>
-	<button class="btn btn-primary" disabled={!duel.value} onclick={() => duelBet(2)}>
-		{duel.value?.nameSecond ?? ''}
+	<button
+		class="btn btn-primary"
+		disabled={!duel.value}
+		onclick={() => duelBet(duel.value?.secondName)}
+	>
+		{duel.value?.secondName ?? ''}
 	</button>
 </div>

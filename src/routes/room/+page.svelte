@@ -14,12 +14,25 @@
 	let userId = data.user.id;
 	const isBetted = createPersistentStore<boolean>('isBetted', false);
 	const MINIMUM_BROKIE = 25;
-
+	let webSocket: WebSocket | undefined = $state(undefined);
+	type EventEvent = { type: 'event'; event: EventType };
 	onMount(() => {
 		if (roomState !== AppState.NoRound) {
 			updateAppToState(roomState, data.room.round);
 		}
-		const webSocket = new WebSocket(`ws://localhost:8787/room/${data.room.id}/ws`);
+		webSocket = new WebSocket(`ws://localhost:8787/room/${data?.room?.id ?? '0'}/ws`);
+		if (webSocket) {
+			webSocket.addEventListener('open', (_) => {
+				console.log('open');
+			});
+			webSocket.addEventListener('message', (ev: MessageEvent<string>) => {
+				console.log(ev);
+				const socketData: EventEvent = JSON.parse(ev.data);
+				if (socketData.type == 'event') {
+					nextState(socketData.event);
+				}
+			});
+		}
 	});
 
 	const savedRound = createPersistentStore('round', data.room.round);

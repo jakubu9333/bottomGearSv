@@ -6,6 +6,10 @@ export const getUser = async (env: Env, userId: number) => {
 	return (await db(env).select({ id: user.id, name: user.name, isAdmin: user.isAdmin }).from(user).where(eq(user.id, userId)))[0]
 }
 
+export const getUserMoney = async (env: Env, userId: number) => {
+	return (await db(env).select({ id: user.id, name: user.name, money: user.money }).from(user).where(eq(user.id, userId)))[0]
+}
+
 export const getUserByGoogleId = async (env: Env, googleId: string) => {
 	return (await db(env).select().from(user).where(eq(user.googleId, googleId)))[0]
 }
