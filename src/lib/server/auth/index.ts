@@ -2,7 +2,13 @@ import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from "@oslojs/enco
 import { sha256 } from "@oslojs/crypto/sha2";
 import { dev } from "$app/environment";
 import type { Cookies } from "@sveltejs/kit";
-import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from "$env/static/private";
+import {
+	GOOGLE_CLIENT_ID,
+	GOOGLE_CLIENT_SECRET,
+	ROBEK,
+	GOOGLE_CLIENT_ID_DEV,
+	GOOGLE_CLIENT_SECRET_DEV,
+} from "$env/static/private";
 import { Google } from "arctic";
 
 export interface Session {
@@ -16,6 +22,14 @@ export function google() {
 			GOOGLE_CLIENT_ID,
 			GOOGLE_CLIENT_SECRET,
 			"http://localhost:5173/login/google/callback")
+	}
+	if (ROBEK === "ROBEK_DEV") {
+		return new Google(
+			GOOGLE_CLIENT_ID_DEV,
+			GOOGLE_CLIENT_SECRET_DEV,
+			"http://localhost:8787/login/google/callback"
+		)
+
 	}
 	return new Google(
 		GOOGLE_CLIENT_ID,

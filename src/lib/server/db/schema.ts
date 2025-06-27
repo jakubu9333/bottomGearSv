@@ -1,4 +1,3 @@
-import { AppState } from '$lib';
 import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
 const DEFAULT_MONEY = 250
 export const user = sqliteTable('user', {
@@ -13,7 +12,7 @@ export const user = sqliteTable('user', {
 export const room = sqliteTable('room', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
 	name: text().notNull(),
-	state: integer().notNull().default(AppState.NoRound),
+	state: integer().notNull().default(0),
 	round: integer().notNull().default(0),
 	duelNow: integer("duel_now")
 });

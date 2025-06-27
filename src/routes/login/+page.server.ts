@@ -40,7 +40,7 @@ export const actions = {
         const token = generateSessionToken();
         const session = await createSession(platform.env, token, user.id);
         setSessionTokenCookie(cookies, token, session.expiresAt);
-        redirect(303, "/")
+        redirect(303, "/room")
     }
 } satisfies Actions;
 

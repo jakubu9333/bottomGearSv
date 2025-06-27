@@ -1,7 +1,7 @@
 
 import { validateSessionToken } from '$lib/server/auth';
 import { getUser } from '$lib/server/db/user';
-import { fail, redirect, , type Handle } from '@sveltejs/kit';
+import { fail, redirect, type Handle } from '@sveltejs/kit';
 import type { RequestEvent } from './routes/$types';
 
 const freeUrls = [

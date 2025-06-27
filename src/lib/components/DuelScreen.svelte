@@ -42,12 +42,14 @@
 			return;
 		}
 		errorLook = false;
-		const betResponse = await fetch('/me/bet', { method: 'post',body:{
-			duelId: duel.value.id,
-			winner
-			money : moneyToBet
-			
-		} });
+		const betResponse = await fetch('/me/bet', {
+			method: 'post',
+			body: {
+				duelId: duel.value.id,
+				winner,
+				money: moneyToBet
+			}
+		});
 		if (betResponse.status >= 300) {
 			errorLook = true;
 			return;

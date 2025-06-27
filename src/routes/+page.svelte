@@ -1,24 +1,50 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
+	import DuelScreen from '$lib/components/DuelScreen.svelte';
 	import type { PageProps } from './$types';
 
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 	const user = data.user;
-	const isAdmin = user?.isAdmin??false;
+	$inspect(form);
+	const isAdmin = user?.isAdmin ?? false;
 </script>
 
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
 	<div class="rounded-box bg-base-100 w-full max-w-md p-8 shadow-2xl">
 		<div class="flex flex-col items-center gap-6 text-center">
 			<h1 class="text-4xl font-bold">🚗 Bottom Gear</h1>
+			<form
+				method="POST"
+				action="?/room"
+				class=" flex w-full max-w-xs flex-col space-y-4"
+				use:enhance
+			>
+				<label class="form-control w-full">
+					<div class="label">
+						<span class="label-text">Meno roomky</span>
+					</div>
+					<input
+						type="text"
+						placeholder="Meno roomky"
+						class="input input-bordered w-full"
+						required
+						name="room"
+					/>
+				</label>
 
-			<a href="/login" class="w-full max-w-xs">
-				<button class="btn btn-primary w-full">Prihlásiť sa</button>
-			</a>
-
+				<button class="btn btn-primary w-full">Pripojit sa do roomky</button>
+			</form>
 			{#if isAdmin}
 				<a href="/admin/room" class="w-full max-w-xs">
-					<button class="btn btn-secondary w-full">Vytvoriť roomku</button>
+					<button class="btn btn-primary w-full">Vytvoriť roomku</button>
 				</a>
+				<form method="POST" action="?/token" class="w-full max-w-xs" use:enhance>
+					<button class="btn btn-secondary w-full">Vygeneruj token</button>
+				</form>
+				{#if form?.token}
+					<div>Token</div>
+					<div>{form.token}</div>
+				{/if}
 			{/if}
 		</div>
 	</div>

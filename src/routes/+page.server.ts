@@ -1,5 +1,6 @@
+import { createSession, generateSessionToken } from "$lib/server/auth";
 import { getUser } from "$lib/server/db/user";
-import type { PageServerLoad } from "./$types";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals, platform }) => {
     const userId = locals.userId
@@ -8,3 +9,11 @@ export const load: PageServerLoad = async ({ locals, platform }) => {
         user
     }
 }
+
+export const actions = {
+    token: async (event) => {
+        const token = generateSessionToken()
+        await createSession(event.platform?.env!!, token, event.locals.userId)
+        return { token }
+    }
+} satisfies Actions;
