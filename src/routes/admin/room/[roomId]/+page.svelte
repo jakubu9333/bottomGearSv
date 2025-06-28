@@ -33,7 +33,7 @@
 		<h1 class="mb-6 text-center text-3xl font-bold">
 			Ludia v roomke {room.name}
 		</h1>
-		<a href="/room">
+		<a href="/room" class="mb-2">
 			<button class="btn btn-primary my-2 w-full">Idem stavkovat</button>
 		</a>
 
