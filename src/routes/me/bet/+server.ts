@@ -1,4 +1,5 @@
 import { createNewBet } from "$lib/server/db/bet";
+import { removeUserMoney } from "$lib/server/db/user";
 import type { RequestHandler } from "@sveltejs/kit";
 
 
@@ -14,6 +15,7 @@ export const POST: RequestHandler = async ({ request, locals, platform }) => {
         betFromJson.winner,
         betFromJson.duelId,
         locals.userId)
+    await removeUserMoney(env, locals.userId, betFromJson.money)
 
 
     return Response.json(bet)

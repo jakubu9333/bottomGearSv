@@ -1,13 +1,10 @@
 
 export function createPersistentStore<T>(key: string, startValue: T) {
-  if (typeof window === "undefined") {
-    return {
-      get value() { return startValue },
-      set value(value: T) { }
-    }
+  let storedValue = null
+  if (typeof window !== "undefined") {
+    storedValue = window.localStorage.getItem(key);
   }
 
-  let storedValue = window.localStorage.getItem(key);
   let store = $state(storedValue ? JSON.parse(storedValue) as T : startValue);
 
   $effect(() => {

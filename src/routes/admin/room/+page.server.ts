@@ -1,8 +1,9 @@
 import { createRoom } from "$lib/server/db/room";
+import { setUserRoomId } from "$lib/server/db/user";
 import { fail, redirect, type Actions } from "@sveltejs/kit";
 
 export const actions = {
-	default: async ({ request, platform }) => {
+	default: async ({ request, platform, locals }) => {
 		if (platform === undefined) {
 			return fail(400)
 		}
@@ -12,6 +13,7 @@ export const actions = {
 			return fail(400, { room, missing: true });
 		}
 		const createdRoom = await createRoom(platform.env, room)
+		await setUserRoomId(platform.env, locals.userId, createdRoom.id)
 		if (createdRoom) {
 			return redirect(303, `/admin/room/${createdRoom.id}`)
 		}

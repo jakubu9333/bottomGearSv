@@ -1,14 +1,15 @@
 import { db } from "."
 import { user } from "./schema"
-import { eq } from "drizzle-orm"
+import { eq, sql, desc } from "drizzle-orm"
 
 export const getUser = async (env: Env, userId: number) => {
 	return (await db(env).select({ id: user.id, name: user.name, isAdmin: user.isAdmin }).from(user).where(eq(user.id, userId)))[0]
 }
 
-export const getUserMoney = async (env: Env, userId: number) => {
-	return (await db(env).select({ id: user.id, name: user.name, money: user.money }).from(user).where(eq(user.id, userId)))[0]
+export const getUserMoney = async (env: Env, roomId: number) => {
+	return (await db(env).select({ id: user.id, name: user.name, money: user.money }).from(user).where(eq(user.roomId, roomId)).orderBy(desc(user.money)))
 }
+
 
 export const getUserByGoogleId = async (env: Env, googleId: string) => {
 	return (await db(env).select().from(user).where(eq(user.googleId, googleId)))[0]
@@ -32,4 +33,16 @@ export const createUserWithGoogleId = async (env: Env, googleId: string, userNam
 
 export const changeName = async (env: Env, userId: number, username: string) => {
 	return (await db(env).update(user).set({ name: username, }).where(eq(user.id, userId)).returning())[0]
+}
+
+export const setUserAdmin = async (env: Env, userId: number) => {
+	return (await db(env).update(user).set({ isAdmin: 1 }).where(eq(user.id, userId)).returning())[0]
+}
+
+export const setUserRoomId = async (env: Env, userId: number, roomId: number) => {
+	return (await db(env).update(user).set({ roomId }).where(eq(user.id, userId)).returning())[0]
+}
+
+export const removeUserMoney = async (env: Env, userId: number, money: number) => {
+	return (await db(env).update(user).set({ money: sql`MAX(${user.money} - ${money}, 0)` }).where(eq(user.id, userId)).returning())[0]
 }

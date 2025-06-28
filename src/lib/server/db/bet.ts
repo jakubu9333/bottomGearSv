@@ -14,11 +14,12 @@ export const createNewBet = async (env: Env, money: number, winner: string, duel
 }
 
 export const getAllBetMoneyForDuel = async (env: Env, duelId: number) => {
-	const duels = (await db(env).select({ winner: duelBet.money, money: sum(duelBet.money) }).from(duelBet).where(eq(duelBet.duelId, duelId)).groupBy(duelBet.winner))
+	const duels = (await db(env).select({ winner: duelBet.winner, money: sum(duelBet.money) }).from(duelBet).where(eq(duelBet.duelId, duelId)).groupBy(duelBet.winner))
 	return duels
 }
 
 export const setWinnerMoney = async (env: Env, duelId: number, winner: string, howManyIndex: number) => {
+	console.log("howManyi", howManyIndex)
 	const result = await db(env)
 		.update(user)
 		.set({

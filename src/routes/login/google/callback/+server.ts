@@ -3,7 +3,8 @@ import { decodeIdToken } from "arctic";
 
 import type { RequestEvent } from "@sveltejs/kit";
 import type { OAuth2Tokens } from "arctic";
-import { createUserWithGoogleId, getUserByGoogleId } from "$lib/server/db/user";
+import { createUserWithGoogleId, getUserByGoogleId, setUserAdmin } from "$lib/server/db/user";
+import { ROBEK } from "$env/static/private";
 
 export async function GET(event: RequestEvent): Promise<Response> {
     const googleAuth = google()
@@ -46,6 +47,9 @@ export async function GET(event: RequestEvent): Promise<Response> {
     if (existingUser !== undefined) {
         const sessionToken = generateSessionToken();
         const session = await createSession(event.platform.env, sessionToken, existingUser.id);
+        if (ROBEK === "ROBEK_DEV") {
+            await setUserAdmin(event.platform.env, existingUser.id)
+        }
         setSessionTokenCookie(event.cookies, sessionToken, session.expiresAt);
         return new Response(null, {
             status: 303,

@@ -1,26 +1,28 @@
 <script lang="ts">
-  type Props = {
-    moneyToBet: number;
-    money: number;
-  };
-  let { moneyToBet = $bindable(), money }: Props = $props();
+	type Props = {
+		moneyToBet: number;
+		money: number;
+	};
+	let { moneyToBet = $bindable(), money }: Props = $props();
 </script>
 
-<div class="flex-col flex">
-  <label for="#bet" class="font-bold text-xl">Selected money</label>
-  <input
-    bind:value={moneyToBet}
-    type="number"
-    id="bet"
-    max={money}
-    min="0"
-    class="input input-bordered input-primary"
-  />
-  <input
-    type="range"
-    class="mt-2 range range-primary"
-    bind:value={moneyToBet}
-    min="0"
-    max={money}
-  />
+<div class="form-control">
+	<label for="bet" class="label">
+		<span class="label-text text-lg font-semibold">💰 Vybraná suma</span>
+	</label>
+	<input
+		id="bet"
+		type="number"
+		bind:value={moneyToBet}
+		max={money}
+		min="0"
+		class="input input-bordered input-primary w-full"
+	/>
+	<input
+		type="range"
+		class="range range-primary mt-2 w-full"
+		bind:value={moneyToBet}
+		min="0"
+		max={money}
+	/>
 </div>
