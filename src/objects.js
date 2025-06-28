@@ -53,7 +53,7 @@ export class BottomGearObject extends DurableObject {
 		for (const socket of this.ctx.getWebSockets()) {
 			socket.send(JSON.stringify({ type: "event", event: eventType }))
 		}
-		return `XXX ${name}`
+		return `done`
 
 	}
 }
