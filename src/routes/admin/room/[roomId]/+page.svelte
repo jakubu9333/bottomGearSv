@@ -12,7 +12,9 @@
 		user: string;
 	};
 	onMount(() => {
-		socket = new WebSocket(`ws://localhost:8787/admin/room/${room.id}/ws`);
+		const url = 'bottomgear.uhlo.workers.dev';
+		//const url = localhost:8787
+		socket = new WebSocket(`ws://${url}/admin/room/${room.id}/ws`);
 		if (socket) {
 			socket.addEventListener('open', (_) => {
 				console.log('open');

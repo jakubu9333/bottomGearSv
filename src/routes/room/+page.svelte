@@ -29,7 +29,9 @@
 		if (roomState !== AppState.NoRound) {
 			updateAppToState(roomState, data.room.round);
 		}
-		webSocket = new WebSocket(`ws://localhost:8787/room/${data?.room?.id ?? '0'}/ws`);
+		const url = 'bottomgear.uhlo.workers.dev';
+		//const url = localhost:8787
+		webSocket = new WebSocket(`ws://${url}/room/${data?.room?.id ?? '0'}/ws`);
 		if (webSocket) {
 			webSocket.addEventListener('open', (_) => {
 				console.log('open');
