@@ -1,4 +1,4 @@
-import { eq, sum, and, inArray, sql } from "drizzle-orm"
+import { eq, sum, sql } from "drizzle-orm"
 import { db } from "."
 import { duelBet, user } from "./schema"
 
@@ -18,26 +18,37 @@ export const getAllBetMoneyForDuel = async (env: Env, duelId: number) => {
 	return duels
 }
 
-export const setWinnerMoney = async (env: Env, duelId: number, winner: string, howManyIndex: number) => {
-	console.log("howManyi", howManyIndex)
-	const result = await db(env)
-		.update(user)
-		.set({
-			money: sql`${user.money} * ${howManyIndex}`
-		})
-		.where(
-			inArray(
-				user.id,
-				db(env).select({ userId: duelBet.userId })
-					.from(duelBet)
-					.where(
-						and(
-							eq(duelBet.duelId, duelId),
-							eq(duelBet.winner, winner)
-						)
-					)
-			)
-		)
-		.returning();
-	return result
+export const setWinnerMoney = async (env: Env, duelId: number, winner: string) => {
+	const dbEnv = db(env)
+	const result = await dbEnv.run(sql`
+    WITH bet_calculations AS (
+      SELECT 
+        b.user_id,
+        b.money as my_bet,
+        pools.total_pool,
+        pools.winning_pool,
+        CASE 
+          WHEN pools.winning_pool > 0 
+          THEN (pools.total_pool * b.money) / pools.winning_pool 
+          ELSE 0 
+        END as payout
+      FROM ${duelBet} b
+      CROSS JOIN (
+        SELECT 
+          SUM(money) as total_pool,
+          SUM(CASE WHEN winner = ${winner} THEN money ELSE 0 END) as winning_pool
+        FROM ${duelBet}
+        WHERE duel_id = ${duelId}
+      ) as pools
+      WHERE b.duel_id = ${duelId} 
+        AND b.winner = ${winner}
+    )
+    UPDATE ${user} 
+    SET money = money + bet_calculations.payout
+    FROM bet_calculations
+    WHERE ${user.id} = bet_calculations.user_id
+    RETURNING ${user.id}, ${user.money}
+  `);
+
+	return result.results;
 }

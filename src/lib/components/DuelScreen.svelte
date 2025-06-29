@@ -78,14 +78,14 @@
 		<button
 			class="btn btn-primary w-full"
 			disabled={!duel.value}
-			on:click={() => duelBet(duel.value?.firstName)}
+			onclick={() => duelBet(duel.value?.firstName)}
 		>
 			{duel.value?.firstName ?? 'Hráč 1'}
 		</button>
 		<button
 			class="btn btn-secondary w-full"
 			disabled={!duel.value}
-			on:click={() => duelBet(duel.value?.secondName)}
+			onclick={() => duelBet(duel.value?.secondName)}
 		>
 			{duel.value?.secondName ?? 'Hráč 2'}
 		</button>

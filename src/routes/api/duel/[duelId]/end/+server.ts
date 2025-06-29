@@ -14,30 +14,10 @@ export const POST: RequestHandler = async ({ platform, locals, params, request }
 	}
 	const duel = await setWinner(env, params.duelId, winner.winner)
 	//@ts-ignore
-	const allBettedMoney: { winner: string, money: number }[] = await getAllBetMoneyForDuel(env, params.duelId)
-	const firstDuelant = allBettedMoney[0]
-	console.log("first", firstDuelant)
-	const secondDuelant = allBettedMoney[1]
-	console.log("second", secondDuelant)
-	const allMoney = firstDuelant?.money ?? secondDuelant?.money ?? 0 + secondDuelant?.money ?? firstDuelant?.money ?? 0
-	if (firstDuelant !== undefined && firstDuelant.winner === winner.winner) {
-		const howMany = allMoney / firstDuelant.money
-		const users = await setWinnerMoney(env, +params.duelId, firstDuelant.winner, howMany)
-		const durableObject = getDurrableObject(env, room.id)
-		await durableObject.sendEventSocket(EventType.RoundEnd)
+	const users = await setWinnerMoney(env, +params.duelId, winner.winner)
+	const durableObject = getDurrableObject(env, room.id)
+	await durableObject.sendEventSocket(EventType.RoundEnd)
 
-		return Response.json(users)
+	return Response.json(users)
 
-	} else if (secondDuelant !== undefined && secondDuelant.winner === winner.winner) {
-		const howMany = allMoney / secondDuelant.money
-		const users = await setWinnerMoney(env, +params.duelId, secondDuelant.winner, howMany)
-		const durableObject = getDurrableObject(env, room.id)
-		await durableObject.sendEventSocket(EventType.RoundEnd)
-		return Response.json(users)
-	} else {
-		const durableObject = getDurrableObject(env, room.id)
-		await durableObject.sendEventSocket(EventType.RoundEnd)
-		return Response.json(duel)
-
-	}
 }
