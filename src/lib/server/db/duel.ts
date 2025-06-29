@@ -5,6 +5,11 @@ import { eq } from "drizzle-orm"
 export const createNewDuel = async (env: Env, firstName: string, secondName: string) => {
 	return (await db(env).insert(duel).values({ firstName, secondName, isBettable: 1 }).returning())[0]
 }
+
+export const getDuelById = async (env: Env, duelId: number) => {
+	return (await db(env).select().from(duel).where(eq(duel.id, duelId)))[0]
+}
+
 export const getDuelByRoomId = async (env: Env, roomId: number) => {
 	return (await db(env).select({ id: duel.id, firstName: duel.firstName, secondName: duel.secondName })
 		.from(room)
