@@ -13,6 +13,10 @@
 	<div class="rounded-box bg-base-100 w-full max-w-md p-8 shadow-2xl">
 		<div class="flex flex-col items-center gap-6 text-center">
 			<h1 class="text-4xl font-bold">🚗 Bottom Gear</h1>
+			<h2 class="text-3xl font-bold">Vitaj {user?.name}</h2>
+			<a href="/name" class="w-full max-w-xs">
+				<button class="btn btn-primary w-full">Zmenit meno</button>
+			</a>
 			<form
 				method="POST"
 				action="?/joinRoom"
