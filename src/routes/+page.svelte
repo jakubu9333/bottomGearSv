@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import DuelScreen from '$lib/components/DuelScreen.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 	const user = data.user;
-	$inspect(form);
+	let wantToChangeRoom = $state(false);
 	const isAdmin = user?.isAdmin ?? false;
 </script>
 
@@ -17,27 +16,38 @@
 			<a href="/name" class="w-full max-w-xs">
 				<button class="btn btn-primary w-full">Zmenit meno</button>
 			</a>
-			<form
-				method="POST"
-				action="?/joinRoom"
-				class=" flex w-full max-w-xs flex-col space-y-4"
-				use:enhance
-			>
-				<label class="form-control w-full">
-					<div class="label">
-						<span class="label-text">Meno roomky</span>
-					</div>
-					<input
-						type="text"
-						placeholder="Meno roomky"
-						class="input input-bordered w-full"
-						required
-						name="roomName"
-					/>
-				</label>
+			{#if user.roomId}
+				<a href="/room" class="w-full max-w-xs">
+					<button class="btn btn-primary w-full">Idem stavkovat</button>
+				</a>
+				<button
+					class="btn btn-primary w-full"
+					onclick={() => (wantToChangeRoom = !wantToChangeRoom)}>Zmen roomku</button
+				>
+			{/if}
+			{#if !user.roomId || wantToChangeRoom}
+				<form
+					method="POST"
+					action="?/joinRoom"
+					class=" flex w-full max-w-xs flex-col space-y-4"
+					use:enhance
+				>
+					<label class="form-control w-full">
+						<div class="label">
+							<span class="label-text">Meno roomky</span>
+						</div>
+						<input
+							type="text"
+							placeholder="Meno roomky"
+							class="input input-bordered w-full"
+							required
+							name="roomName"
+						/>
+					</label>
 
-				<button class="btn btn-primary w-full">Pripojit sa do roomky</button>
-			</form>
+					<button class="btn btn-primary w-full">Pripojit sa do roomky</button>
+				</form>
+			{/if}
 			{#if isAdmin}
 				<a href="/admin/room" class="w-full max-w-xs">
 					<button class="btn btn-primary w-full">Vytvoriť roomku</button>
