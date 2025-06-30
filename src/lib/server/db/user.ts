@@ -3,7 +3,7 @@ import { user, room } from "./schema";
 import { eq, sql, desc, and, lt } from "drizzle-orm";
 
 export const getUser = async (env: Env, userId: number) => {
-	return (await db(env).select({ id: user.id, name: user.name, isAdmin: user.isAdmin }).from(user).where(eq(user.id, userId)))[0]
+	return (await db(env).select({ id: user.id, name: user.name, isAdmin: user.isAdmin, roomId: user.roomId }).from(user).where(eq(user.id, userId)))[0]
 }
 
 export const getUserMoney = async (env: Env, roomId: number) => {
@@ -61,19 +61,19 @@ export const giveFreeMoneyToBrokeBoys = async (env: Env, roomId: number) => {
 }
 
 export const joinRoomByName = async (env: Env, roomName: string, userId: number) => {
-    const dbEnv = db(env);
+	const dbEnv = db(env);
 
-    const roomCte = dbEnv.$with('room_cte').as(
-        dbEnv.select({ id: room.id }).from(room).where(eq(room.name, roomName))
-    );
+	const roomCte = dbEnv.$with('room_cte').as(
+		dbEnv.select({ id: room.id }).from(room).where(eq(room.name, roomName))
+	);
 
-    const updatedUsers = await dbEnv.with(roomCte).update(user).set({
-        roomId: sql`(select id from ${roomCte})`
-    }).where(eq(user.id, userId)).returning({ id: user.id, roomId: user.roomId });
+	const updatedUsers = await dbEnv.with(roomCte).update(user).set({
+		roomId: sql`(select id from ${roomCte})`
+	}).where(eq(user.id, userId)).returning({ id: user.id, roomId: user.roomId });
 
-    if (updatedUsers.length > 0 && updatedUsers[0].roomId !== null) {
-        return updatedUsers[0];
-    } else {
-        return { error: "Room not found" };
-    }
+	if (updatedUsers.length > 0 && updatedUsers[0].roomId !== null) {
+		return updatedUsers[0];
+	} else {
+		return { error: "Room not found" };
+	}
 }
