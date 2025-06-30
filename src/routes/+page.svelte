@@ -21,7 +21,7 @@
 					<button class="btn btn-primary w-full">Idem stavkovat</button>
 				</a>
 				<button
-					class="btn btn-primary w-full"
+					class="btn btn-primary w-full max-w-xs"
 					onclick={() => (wantToChangeRoom = !wantToChangeRoom)}>Zmen roomku</button
 				>
 			{/if}
