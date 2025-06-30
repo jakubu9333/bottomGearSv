@@ -15,7 +15,7 @@
 			<h1 class="text-4xl font-bold">🚗 Bottom Gear</h1>
 			<form
 				method="POST"
-				action="?/room"
+				action="?/joinRoom"
 				class=" flex w-full max-w-xs flex-col space-y-4"
 				use:enhance
 			>
@@ -28,7 +28,7 @@
 						placeholder="Meno roomky"
 						class="input input-bordered w-full"
 						required
-						name="room"
+						name="roomName"
 					/>
 				</label>
 

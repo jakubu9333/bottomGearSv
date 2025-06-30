@@ -1,5 +1,6 @@
 import { createSession, generateSessionToken } from "$lib/server/auth";
-import { getUser } from "$lib/server/db/user";
+import { getUser, joinRoomByName } from "$lib/server/db/user";
+import { fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals, platform }) => {
@@ -15,5 +16,17 @@ export const actions = {
         const token = generateSessionToken()
         await createSession(event.platform?.env!!, token, event.locals.userId)
         return { token }
+    },
+    joinRoom: async ({ request, platform, locals }) => {
+        const data = await request.formData();
+        const roomName = data.get('roomName');
+        if (!roomName) {
+            return fail(400, { roomName, missing: true });
+        }
+        const result = await joinRoomByName(platform?.env!!, roomName.toString(), locals.userId);
+        if ('error' in result) {
+            return fail(404, { roomName, error: result.error });
+        }
+        throw redirect(303, `/room`)
     }
 } satisfies Actions;
