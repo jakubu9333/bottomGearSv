@@ -15,25 +15,19 @@ export const actions = {
         const username = data.get('username')
         const room = data.get('room')
         if (!username || username instanceof File || username.length == 0) {
-            return fail(400, { username, missing: true });
+            return fail(400, { error: "username is missing" });
         }
         if (!room || room instanceof File || room.length == 0) {
-            return fail(400, { room, missing: true });
+            return fail(400, { error: "room is missing" });
         }
         const env = platform?.env
         let user;
-        let roomFromDb
-        if (false && ROBEK === "ROBEK_DEV" && room.includes("test")) {
-            roomFromDb = await createRoom(env, room)
-            user = await createUserAdmin(env, username, roomFromDb.id)
+        const roomFromDb = await getRoomByName(env, room)
+        if (!roomFromDb) {
+            return fail(400, { error: "room not found" });
         }
-        else {
-            roomFromDb = await getRoomByName(env, room)
-            if (!roomFromDb) {
-                return fail(400, { room, missing: true });
-            }
-            user = await createUser(env, username, roomFromDb.id)
-        }
+        user = await createUser(env, username, roomFromDb.id)
+
         const roomDurableObject = getDurrableObject(env, roomFromDb.id)
         const result = await roomDurableObject.joinRoom(username)
         console.log("after stub", result)

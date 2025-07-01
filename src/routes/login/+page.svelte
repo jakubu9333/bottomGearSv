@@ -8,6 +8,9 @@
 
 		<!-- Prihlasovací formulár -->
 		<form class="flex flex-col space-y-4" method="POST" use:enhance>
+			{#if form?.error}
+				<div class="alert alert-error">{form.error}</div>
+			{/if}
 			<label class="form-control w-full">
 				<div class="label">
 					<span class="label-text">Tvoje prihlasovacie meno</span>

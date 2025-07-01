@@ -32,6 +32,9 @@
 					class=" flex w-full max-w-xs flex-col space-y-4"
 					use:enhance
 				>
+					{#if form?.error}
+						<div class="alert alert-error">{form.error}</div>
+					{/if}
 					<label class="form-control w-full">
 						<div class="label">
 							<span class="label-text">Meno roomky</span>

@@ -72,8 +72,8 @@ export const joinRoomByName = async (env: Env, roomName: string, userId: number)
 	}).where(eq(user.id, userId)).returning({ id: user.id, roomId: user.roomId });
 
 	if (updatedUsers.length > 0 && updatedUsers[0].roomId !== null) {
-		return updatedUsers[0];
-	} else {
-		return { error: "Room not found" };
-	}
+        return updatedUsers[0];
+    } else {
+        return { message: "Room not found" };
+    }
 }
