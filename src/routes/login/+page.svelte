@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import type { PageProps } from './$types';
+	let { form }: PageProps = $props();
 </script>
 
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
