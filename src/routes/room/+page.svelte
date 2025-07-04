@@ -14,7 +14,7 @@
 	let userId = data.user.id;
 	const savedRound = createPersistentStore('round', data.room.round);
 	const isBetted = createPersistentStore<boolean>('isBetted', false);
-	const moneyBeforeWin = createPersistentStore<number>('beforeWinMoney', data.user.money);
+	const moneyBeforeBet = createPersistentStore<number>('beforeWinMoney', data.user.money);
 	const defaultBetItem = {
 		name: '',
 		money: 0
@@ -51,6 +51,7 @@
 		isBetted.value = false;
 	}
 
+	//update refresh
 	function updateAppToState(state: number, round: number) {
 		const canResetBet = savedRound.value !== round || state === AppState.RoundEnded;
 		if (canResetBet) {
@@ -61,8 +62,8 @@
 			state = AppState.DuelBetPlaced;
 			console.log(isBetted.value);
 		}
-		if (state === AppState.DuelBetEnded || state === AppState.DuelBetPlaced) {
-			moneyBeforeWin.value = money;
+		if (state === AppState.DuelBetStart){
+			moneyBeforeBet.value = money
 		}
 		if (state === AppState.RoundEnded) {
 			getWin();
@@ -96,7 +97,6 @@
 
 	async function makeBetStateDuel() {
 		nextState(EventType.DuelBetPlaced);
-		moneyBeforeWin.value = money;
 		isBetted.value = true;
 		console.log('isBetted', isBetted.value);
 	}
@@ -108,15 +108,17 @@
 	//update socket
 	async function nextState(eventType: EventType) {
 		roomState = getNextTransition(eventType, roomState);
+		if (roomState === AppState.DuelBetStart) {
+			moneyBeforeBet.value = money;
+		}
 		if (roomState === AppState.RoundEnded) {
-			moneyBeforeWin.value = money;
 			getWin();
 			round++;
 			savedRound.value = round;
 			resetBet();
 		}
 	}
-	let moneyDiff = $derived(money - moneyBeforeWin.value - betItemToShow.value.money);
+	let moneyDiff = $derived(money - moneyBeforeBet.value);
 </script>
 
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
