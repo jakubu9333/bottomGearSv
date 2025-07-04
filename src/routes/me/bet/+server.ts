@@ -8,7 +8,7 @@ type Bet = { winner: string, money: number, duelId: number }
 export const POST: RequestHandler = async ({ request, locals, platform }) => {
     const env = platform?.env!!
     const betFromJson: Bet = await request.json()
-    if (!betFromJson.winner || !betFromJson.duelId || betFromJson.money === undefined) {
+    if (!betFromJson.winner || !betFromJson.duelId || betFromJson.money === undefined || betFromJson.money === null) {
         return Response.json({ desc: "invalid bet object correct {money,duelId,winner}" }, { status: 400 })
     }
     const isDuelBettable = (await getDuelById(env, betFromJson.duelId)).isBettable === 1
