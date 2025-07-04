@@ -31,7 +31,7 @@
 		}
 		const url = 'bottomgear.uhlo.workers.dev';
 		//const url = localhost:8787
-		webSocket = new WebSocket(`ws://${url}/room/${data?.room?.id ?? '0'}/ws`);
+		webSocket = new WebSocket(`wss://${url}/room/${data?.room?.id ?? '0'}/ws`);
 		if (webSocket) {
 			webSocket.addEventListener('open', (_) => {
 				console.log('open');
