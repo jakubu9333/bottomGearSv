@@ -14,6 +14,7 @@
 	let userId = data.user.id;
 	const savedRound = createPersistentStore('round', data.room.round);
 	const isBetted = createPersistentStore<boolean>('isBetted', false);
+	const moneyBeforeWin = createPersistentStore<number>('beforeWinMoney', data.user.money);
 	const defaultBetItem = {
 		name: '',
 		money: 0
@@ -22,7 +23,6 @@
 		'betItem',
 		defaultBetItem
 	);
-	const MINIMUM_BROKIE = 25;
 	let webSocket: WebSocket | undefined = $state(undefined);
 	type EventEvent = { type: 'event'; event: EventType };
 	onMount(() => {
@@ -55,6 +55,7 @@
 		const canResetBet = savedRound.value !== round || state === AppState.RoundEnded;
 		if (canResetBet) {
 			resetBet();
+			moneyBeforeWin.value = money
 		}
 		const isBetDuelRound = state === AppState.DuelBetStart;
 		if (isBetDuelRound && isBetted.value) {
@@ -62,7 +63,7 @@
 			console.log(isBetted.value);
 		}
 		if (state === AppState.RoundEnded) {
-			getWin(true);
+			getWin();
 		}
 		savedRound.value = round;
 
@@ -70,7 +71,7 @@
 		round = round;
 	}
 
-	let oldMoney = money;
+	let moneyBeforeWinAfterBet = $state(money);
 	async function getLeaderBoard(): Promise<{ money: number; id: number; name: string }[] | null> {
 		const response = await fetch(`/room/${data.room.id}/leaderboard`);
 		if (response.status !== 200) {
@@ -82,22 +83,21 @@
 
 	let leaderBoard: { name: string; money: number; id: number }[] = $state([]);
 
-	async function getWin(save: boolean) {
+	async function getWin() {
 		const newLeaderBoard = await getLeaderBoard();
 		if (newLeaderBoard === null) {
 			return;
 		}
 		leaderBoard = newLeaderBoard;
 		const me = newLeaderBoard.find((item) => item.id === data.user.id);
-		if (save) {
-			oldMoney = money;
-			money = me?.money ?? 0;
-		}
+		moneyBeforeWinAfterBet = money;
+		money = me?.money ?? 0;
 	}
 
 	async function makeBetStateDuel() {
 		nextState(EventType.DuelBetPlaced);
 		isBetted.value = true;
+		moneyBeforeWin.value = money;
 		console.log('isBetted', isBetted.value);
 	}
 
@@ -107,18 +107,14 @@
 
 	async function nextState(eventType: EventType) {
 		roomState = getNextTransition(eventType, roomState);
-
-		if (roomState === AppState.DuelBetStart && money < MINIMUM_BROKIE) {
-			getWin(false);
-		}
 		if (roomState === AppState.RoundEnded) {
-			getWin(true);
+			getWin();
 			round++;
 			savedRound.value = round;
 			resetBet();
 		}
 	}
-	let moneyDiff = $derived(money - oldMoney);
+	let moneyDiff = $derived(money - moneyBeforeWin.value - betItemToShow.value.money);
 </script>
 
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
