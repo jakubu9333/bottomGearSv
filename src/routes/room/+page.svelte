@@ -55,12 +55,14 @@
 		const canResetBet = savedRound.value !== round || state === AppState.RoundEnded;
 		if (canResetBet) {
 			resetBet();
-			moneyBeforeWin.value = money
 		}
 		const isBetDuelRound = state === AppState.DuelBetStart;
 		if (isBetDuelRound && isBetted.value) {
 			state = AppState.DuelBetPlaced;
 			console.log(isBetted.value);
+		}
+		if (state === AppState.DuelBetEnded || state === AppState.DuelBetPlaced) {
+			moneyBeforeWin.value = money;
 		}
 		if (state === AppState.RoundEnded) {
 			getWin();
@@ -71,7 +73,6 @@
 		round = round;
 	}
 
-	let moneyBeforeWinAfterBet = $state(money);
 	async function getLeaderBoard(): Promise<{ money: number; id: number; name: string }[] | null> {
 		const response = await fetch(`/room/${data.room.id}/leaderboard`);
 		if (response.status !== 200) {
@@ -90,14 +91,13 @@
 		}
 		leaderBoard = newLeaderBoard;
 		const me = newLeaderBoard.find((item) => item.id === data.user.id);
-		moneyBeforeWinAfterBet = money;
 		money = me?.money ?? 0;
 	}
 
 	async function makeBetStateDuel() {
 		nextState(EventType.DuelBetPlaced);
-		isBetted.value = true;
 		moneyBeforeWin.value = money;
+		isBetted.value = true;
 		console.log('isBetted', isBetted.value);
 	}
 
@@ -105,9 +105,11 @@
 		roomState === AppState.DuelBetPlaced ? AppState.DuelBetEnded : roomState
 	);
 
+	//update socket
 	async function nextState(eventType: EventType) {
 		roomState = getNextTransition(eventType, roomState);
 		if (roomState === AppState.RoundEnded) {
+			moneyBeforeWin.value = money;
 			getWin();
 			round++;
 			savedRound.value = round;
