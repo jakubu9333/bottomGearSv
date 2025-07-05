@@ -3,7 +3,7 @@ import { user, room } from "./schema";
 import { eq, sql, desc, and, lt } from "drizzle-orm";
 
 export const getUser = async (env: Env, userId: number) => {
-	return (await db(env).select({ id: user.id, name: user.name, isAdmin: user.isAdmin, roomId: user.roomId }).from(user).where(eq(user.id, userId)))[0]
+	return (await db(env).select({ id: user.id, name: user.name, isAdmin: user.isAdmin, roomId: user.roomId, money: user.money}).from(user).where(eq(user.id, userId)))[0]
 }
 
 export const getUserMoney = async (env: Env, roomId: number) => {
