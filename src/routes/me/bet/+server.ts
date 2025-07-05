@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ request, locals, platform }) => {
     const userMoney = await getUser(env,locals.userId)
     if (userMoney.money < betFromJson.money){
        return Response.json({ desc: "invalid bet object correct {money,duelId,winner}" }, { status: 400 
-}
+})}
     const isDuelBettable = (await getDuelById(env, betFromJson.duelId)).isBettable === 1
     if (!isDuelBettable) {
         return Response.json({ desc: "duel is not bettable" }, { status: 400 })
