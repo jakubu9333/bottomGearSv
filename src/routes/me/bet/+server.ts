@@ -1,5 +1,5 @@
 import { createNewBet } from "$lib/server/db/bet";
-import { getRoomByUserId } from "$lib/server/db/room";
+import { get } from "$lib/server/db/user";
 import { getDuelById } from "$lib/server/db/duel";
 import { removeUserMoney } from "$lib/server/db/user";
 import type { RequestHandler } from "@sveltejs/kit";
