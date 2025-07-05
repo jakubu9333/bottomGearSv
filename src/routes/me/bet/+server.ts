@@ -1,5 +1,5 @@
 import { createNewBet } from "$lib/server/db/bet";
-import { get } from "$lib/server/db/user";
+import { getUserMoney } from "$lib/server/db/user";
 import { getDuelById } from "$lib/server/db/duel";
 import { removeUserMoney } from "$lib/server/db/user";
 import type { RequestHandler } from "@sveltejs/kit";
@@ -12,6 +12,7 @@ export const POST: RequestHandler = async ({ request, locals, platform }) => {
     if (!betFromJson.winner || !betFromJson.duelId || betFromJson.money === undefined || betFromJson.money === null) {
         return Response.json({ desc: "invalid bet object correct {money,duelId,winner}" }, { status: 400 })
     }
+    const userMoney = await getUserMoney(env,locals.userId)
     const isDuelBettable = (await getDuelById(env, betFromJson.duelId)).isBettable === 1
     if (!isDuelBettable) {
         return Response.json({ desc: "duel is not bettable" }, { status: 400 })
