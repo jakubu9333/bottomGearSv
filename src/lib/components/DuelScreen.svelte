@@ -37,8 +37,14 @@
 		duel.value = duelData;
 	});
 	let errorLook = $state(false);
+	let moneyWarning = $state(false);
 
 	async function duelBet(winner: string | undefined) {
+		if (moneyToBet === 0) {
+			moneyWarning = true;
+			return;
+		}
+		moneyWarning = false;
 		if (duel.value === null || winner === undefined) {
 			return;
 		}
@@ -70,6 +76,11 @@
 	{#if errorLook}
 		<div class="alert alert-error">
 			<span>⚠️ Niečo sa pokazilo. Skús znova.</span>
+		</div>
+	{/if}
+	{#if moneyWarning}
+		<div class="alert alert-warning">
+			<span>⚠️ NStavka s nulou nie je povolená.</span>
 		</div>
 	{/if}
 
