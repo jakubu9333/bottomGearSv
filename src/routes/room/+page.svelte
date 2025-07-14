@@ -6,48 +6,45 @@
 	import DuelScreen from '$lib/components/DuelScreen.svelte';
 	import { EventType, getNextTransition } from '$lib/components/transition';
 	import { fade } from 'svelte/transition';
+	import { RealtimeDuel } from '$lib/components/realtimeDuel.svelte';
 
 	let { data }: PageProps = $props();
 	let roomState = $state(data.room.state);
 	let money = $state(data.user.money);
 	let round = $state(data.room.round);
 	let userId = data.user.id;
+	const betDataHolder = new RealtimeDuel();
 	const savedRound = createPersistentStore('round', data.room.round);
 	const isBetted = createPersistentStore<boolean>('isBetted', false);
 	const moneyBeforeBet = createPersistentStore<number>('beforeWinMoney', data.user.money);
-	const defaultBetItem = {
-		name: '',
-		money: 0
-	};
-	const betItemToShow: { value: { name: string; money: number } } = createPersistentStore(
-		'betItem',
-		defaultBetItem
-	);
 	let webSocket: WebSocket | undefined = $state(undefined);
 	type EventEvent = { type: 'event'; event: EventType };
+	type BetingEvent = { type: 'bet'; money: number; winner: string };
 	onMount(() => {
 		if (roomState !== AppState.NoRound) {
 			updateAppToState(roomState, data.room.round);
 		}
-		const url = 'bottomgear.uhlo.workers.dev';
-		//const url = localhost:8787
-		webSocket = new WebSocket(`wss://${url}/room/${data?.room?.id ?? '0'}/ws`);
+		//const socketUrl = 'wss://bottomgear.uhlo.workers.dev';
+		const socketUrl = 'ws://localhost:8787'
+		webSocket = new WebSocket(`${socketUrl}/room/${data?.room?.id ?? '0'}/ws`);
 		if (webSocket) {
 			webSocket.addEventListener('open', (_) => {
 				console.log('open');
 			});
 			webSocket.addEventListener('message', (ev: MessageEvent<string>) => {
 				console.log(ev);
-				const socketData: EventEvent = JSON.parse(ev.data);
+				const socketData: EventEvent | BetingEvent = JSON.parse(ev.data);
 				if (socketData.type == 'event') {
 					nextState(socketData.event);
+				}
+				if (socketData.type == 'bet') {
+					betDataHolder.addBet(socketData.money, socketData.winner);
 				}
 			});
 		}
 	});
 
 	function resetBet() {
-		betItemToShow.value = defaultBetItem;
 		isBetted.value = false;
 	}
 
@@ -62,8 +59,8 @@
 			state = AppState.DuelBetPlaced;
 			console.log(isBetted.value);
 		}
-		if (state === AppState.DuelBetStart){
-			moneyBeforeBet.value = money
+		if (state === AppState.DuelBetStart) {
+			moneyBeforeBet.value = money;
 		}
 		if (state === AppState.RoundEnded) {
 			getWin();
@@ -142,8 +139,9 @@
 						{userId}
 						roomId={+data.room.id}
 						bind:money
+						getEstimatedPayout={betDataHolder.getEstimatedPayoutIndex}
 						makeBetState={makeBetStateDuel}
-						bind:betItemToShow={betItemToShow.value}
+						setBetItem={betDataHolder.addMybet}
 					/>
 				{:else if derivedAppState === AppState.DuelBetEnded}
 					<div class="space-y-2 text-center">
@@ -153,8 +151,11 @@
 						{:else}
 							<h2 class="text-success text-xl font-bold">✅ Stávka zaregistrovaná</h2>
 							<p class="text-base-content/70 text-sm">
-								vsadil si {betItemToShow.value.money} na
-								<span class="font-semibold">{betItemToShow.value.name}</span>
+								vsadil si {betDataHolder.getBetItem().money} na
+								<span class="font-semibold">{betDataHolder.getBetItem().name}</span>
+							</p>
+							<p class="text-base-content/70 text-sm">
+								Predpokladana vyhra je {betDataHolder.getMyEstimatedPayout()}
 							</p>
 							<p class="text-base-content/70 text-sm">Počkaj na koniec kola</p>
 						{/if}

@@ -3,10 +3,10 @@ import { user, room } from "./schema";
 import { eq, sql, desc, and, lt } from "drizzle-orm";
 
 export const getUser = async (env: Env, userId: number) => {
-	return (await db(env).select({ id: user.id, name: user.name, isAdmin: user.isAdmin, roomId: user.roomId, money: user.money}).from(user).where(eq(user.id, userId)))[0]
+	return (await db(env).select({ id: user.id, name: user.name, isAdmin: user.isAdmin, roomId: user.roomId, money: user.money }).from(user).where(eq(user.id, userId)))[0]
 }
 
-export const getUserMoney = async (env: Env, roomId: number) => {
+export const getLeaderBoard = async (env: Env, roomId: number) => {
 	return (await db(env).select({ id: user.id, name: user.name, money: user.money }).from(user).where(eq(user.roomId, roomId)).orderBy(desc(user.money)))
 }
 
@@ -72,8 +72,8 @@ export const joinRoomByName = async (env: Env, roomName: string, userId: number)
 	}).where(eq(user.id, userId)).returning({ id: user.id, roomId: user.roomId });
 
 	if (updatedUsers.length > 0 && updatedUsers[0].roomId !== null) {
-        return updatedUsers[0];
-    } else {
-        return { message: "Room not found" };
-    }
+		return updatedUsers[0];
+	} else {
+		return { message: "Room not found" };
+	}
 }

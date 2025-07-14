@@ -1,23 +1,25 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import MoneyInput from './MoneyInput.svelte';
+	import type { Duel } from '$lib/types';
 	let {
 		money = $bindable(),
-		betItemToShow = $bindable(),
+		setBetItem,
 		makeBetState,
+		getEstimatedPayout: getEstimatedPayoutIndex,
 		roomId
 	}: {
 		money: number;
 		userId: number;
 		roomId: number;
-		betItemToShow: { name: string; money: number };
+		setBetItem: (money: number, name: string) => void;
+		getEstimatedPayout: (name: string) => number;
 		makeBetState: () => void;
 	} = $props();
 	let moneyToBet = $state(0);
 	let duel: {
 		value: null | Duel;
 	} = $state({ value: null });
-	type Duel = { id: number; firstName: string; secondName: string };
 
 	async function getDuel(): Promise<Duel | null> {
 		const response = await fetch(`/room/${roomId}/duel`);
@@ -61,9 +63,7 @@
 			errorLook = true;
 			return;
 		}
-		const bettedFor = winner;
-		betItemToShow.name = bettedFor;
-		betItemToShow.money = moneyToBet;
+		setBetItem(money, winner);
 		money -= moneyToBet;
 		makeBetState();
 
@@ -93,12 +93,18 @@
 		>
 			{duel.value?.firstName ?? 'Hráč 1'}
 		</button>
+		{#if duel.value}
+			<p class="text-base-content/70 text-center text-sm">
+				Zisk: {Math.round(getEstimatedPayoutIndex(duel.value.firstName) * moneyToBet)}💰
+			</p>
+		{/if}
 		<button
-			class="btn btn-secondary w-full"
+			class="btn btn-secondary w-full justify-between"
 			disabled={!duel.value}
 			onclick={() => duelBet(duel.value?.secondName)}
 		>
-			{duel.value?.secondName ?? 'Hráč 2'}
+			<p class="font-semibold">{duel.value?.secondName}</p>
+			<span class="text-sm">Stav</span>
 		</button>
 	</div>
 </div>

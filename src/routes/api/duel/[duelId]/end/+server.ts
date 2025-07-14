@@ -1,5 +1,5 @@
 import { EventType } from "$lib/components/transition";
-import { getAllBetMoneyForDuel, setWinnerMoney } from "$lib/server/db/bet";
+import { setWinnerMoney } from "$lib/server/db/bet";
 import { setWinner } from "$lib/server/db/duel";
 import { endDuelRoundInRoom } from "$lib/server/db/room";
 import { giveFreeMoneyToBrokeBoys } from "$lib/server/db/user";
