@@ -7,8 +7,6 @@ export class RealtimeDuel {
   private allMoney: { value: number; };
   private secondMoney: { value: number; };
   private firstMoney: { value: number; };
-  private firstPayoutIndex
-  private secondPayoutIndex
   constructor() {
     const defaultDuel = { firstName: "", secondName: "", id: 0 }
     this.duel = createPersistentStore<Duel>("duel", defaultDuel)
@@ -23,15 +21,13 @@ export class RealtimeDuel {
     this.allMoney = createPersistentStore("allMoney", 0)
     this.firstMoney = createPersistentStore("firstMoney", 0)
     this.secondMoney = createPersistentStore("secondMoney", 0)
-    this.firstPayoutIndex = $derived(this.allMoney.value / this.firstMoney.value)
-    this.secondPayoutIndex = $derived(this.allMoney.value / this.secondMoney.value)
   }
 
-  setDuel(duel: Duel) {
+  setDuel = (duel: Duel) => {
     this.duel.value = duel
   }
 
-  addBet(money: number, winner: string) {
+  addBet = (money: number, winner: string) => {
     this.allMoney.value += money
     if (this.duel.value.firstName === winner) {
       this.firstMoney.value += money
@@ -41,24 +37,34 @@ export class RealtimeDuel {
     }
   }
 
-
-  getEstimatedPayoutIndex(name: string) {
-    if (name === this.duel.value.firstName) {
-      return this.firstPayoutIndex
+  getEstimatedPayoutIndex = (money: number, index: number) => {
+    if (money === 0) {
+      return 1
     }
-    return this.secondPayoutIndex
+    if (index === 0) {
+      return (this.allMoney.value + money) / (this.firstMoney.value + money)
+    }
+    return (this.allMoney.value + money) / (this.secondMoney.value + money)
   }
 
-  getMyEstimatedPayout() {
-    return this.getEstimatedPayoutIndex(this.betItem.value.name) * this.betItem.value.money
+
+  private getEstimatedPayoutIndexWithName = (name: string) => {
+    if (name === this.duel.value.firstName) {
+      return this.allMoney.value / this.firstMoney.value
+    }
+    return this.allMoney.value / this.secondMoney.value
   }
 
-  addMybet(money: number, winner: string) {
+  getMyEstimatedPayout = () => {
+    return this.getEstimatedPayoutIndexWithName(this.betItem.value.name) * this.betItem.value.money
+  }
+
+  addMybet = (money: number, winner: string) => {
     this.betItem.value = { name: winner, money }
     this.addBet(money, winner)
   }
 
-  getBetItem() {
+  getBetItem = () => {
     return this.betItem.value
   }
 }

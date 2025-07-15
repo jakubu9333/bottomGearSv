@@ -12,8 +12,8 @@
 	let roomState = $state(data.room.state);
 	let money = $state(data.user.money);
 	let round = $state(data.room.round);
-	let userId = data.user.id;
 	const betDataHolder = new RealtimeDuel();
+	let userId = data.user.id;
 	const savedRound = createPersistentStore('round', data.room.round);
 	const isBetted = createPersistentStore<boolean>('isBetted', false);
 	const moneyBeforeBet = createPersistentStore<number>('beforeWinMoney', data.user.money);
@@ -25,7 +25,7 @@
 			updateAppToState(roomState, data.room.round);
 		}
 		//const socketUrl = 'wss://bottomgear.uhlo.workers.dev';
-		const socketUrl = 'ws://localhost:8787'
+		const socketUrl = 'ws://localhost:8787';
 		webSocket = new WebSocket(`${socketUrl}/room/${data?.room?.id ?? '0'}/ws`);
 		if (webSocket) {
 			webSocket.addEventListener('open', (_) => {
@@ -38,7 +38,7 @@
 					nextState(socketData.event);
 				}
 				if (socketData.type == 'bet') {
-					betDataHolder.addBet(socketData.money, socketData.winner);
+					betDataHolder?.addBet(socketData.money, socketData.winner);
 				}
 			});
 		}
@@ -137,9 +137,10 @@
 				{:else if roomState === AppState.DuelBetStart}
 					<DuelScreen
 						{userId}
+						setDuel={betDataHolder.setDuel}
 						roomId={+data.room.id}
 						bind:money
-						getEstimatedPayout={betDataHolder.getEstimatedPayoutIndex}
+						getEstimatedPayoutIndex={betDataHolder.getEstimatedPayoutIndex}
 						makeBetState={makeBetStateDuel}
 						setBetItem={betDataHolder.addMybet}
 					/>
@@ -151,11 +152,11 @@
 						{:else}
 							<h2 class="text-success text-xl font-bold">✅ Stávka zaregistrovaná</h2>
 							<p class="text-base-content/70 text-sm">
-								vsadil si {betDataHolder.getBetItem().money} na
-								<span class="font-semibold">{betDataHolder.getBetItem().name}</span>
+								vsadil si {betDataHolder?.getBetItem().money} na
+								<span class="font-semibold">{betDataHolder?.getBetItem().name}</span>
 							</p>
 							<p class="text-base-content/70 text-sm">
-								Predpokladana vyhra je {betDataHolder.getMyEstimatedPayout()}
+								Predpokladana vyhra je {betDataHolder?.getMyEstimatedPayout()}
 							</p>
 							<p class="text-base-content/70 text-sm">Počkaj na koniec kola</p>
 						{/if}

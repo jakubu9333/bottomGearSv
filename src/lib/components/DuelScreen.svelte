@@ -5,15 +5,17 @@
 	let {
 		money = $bindable(),
 		setBetItem,
+		setDuel,
 		makeBetState,
-		getEstimatedPayout: getEstimatedPayoutIndex,
+		getEstimatedPayoutIndex,
 		roomId
 	}: {
 		money: number;
 		userId: number;
 		roomId: number;
+		setDuel: (duel: Duel) => void;
 		setBetItem: (money: number, name: string) => void;
-		getEstimatedPayout: (name: string) => number;
+		getEstimatedPayoutIndex: (money: number, index: number) => number;
 		makeBetState: () => void;
 	} = $props();
 	let moneyToBet = $state(0);
@@ -37,18 +39,25 @@
 			return;
 		}
 		duel.value = duelData;
+		setDuel(duelData);
 	});
 	let errorLook = $state(false);
 	let moneyWarning = $state(false);
 
-	async function duelBet(winner: string | undefined) {
+	async function duelBet(winnerIndex: number | undefined) {
 		if (moneyToBet === 0) {
 			moneyWarning = true;
 			return;
 		}
 		moneyWarning = false;
-		if (duel.value === null || winner === undefined) {
+		if (duel.value === null || winnerIndex === undefined) {
 			return;
+		}
+		let winner;
+		if (winnerIndex === 0) {
+			winner = duel.value.firstName;
+		} else {
+			winner = duel.value.secondName;
 		}
 		errorLook = false;
 		const betResponse = await fetch('/me/bet', {
@@ -80,31 +89,38 @@
 	{/if}
 	{#if moneyWarning}
 		<div class="alert alert-warning">
-			<span>⚠️ NStavka s nulou nie je povolená.</span>
+			<span>⚠️ Stavka s nulou nie je povolená.</span>
 		</div>
 	{/if}
 
 	<MoneyInput {money} bind:moneyToBet />
 	<div class="flex flex-col gap-4">
-		<button
-			class="btn btn-primary w-full"
-			disabled={!duel.value}
-			onclick={() => duelBet(duel.value?.firstName)}
-		>
+		<button class="btn btn-primary w-full" disabled={!duel.value} onclick={() => duelBet(0)}>
 			{duel.value?.firstName ?? 'Hráč 1'}
 		</button>
 		{#if duel.value}
 			<p class="text-base-content/70 text-center text-sm">
-				Zisk: {Math.round(getEstimatedPayoutIndex(duel.value.firstName) * moneyToBet)}💰
+				Kurz: {Math.round(getEstimatedPayoutIndex(moneyToBet, 0))}
+			</p>
+			<p class="text-base-content/70 text-center text-sm">
+				Potencionalny Zisk: {Math.round(getEstimatedPayoutIndex(moneyToBet, 0) * money - money)}
 			</p>
 		{/if}
 		<button
 			class="btn btn-secondary w-full justify-between"
 			disabled={!duel.value}
-			onclick={() => duelBet(duel.value?.secondName)}
+			onclick={() => duelBet(1)}
 		>
 			<p class="font-semibold">{duel.value?.secondName}</p>
 			<span class="text-sm">Stav</span>
 		</button>
+		{#if duel.value}
+			<p class="text-base-content/70 text-center text-sm">
+				Kurz: {Math.round(getEstimatedPayoutIndex(moneyToBet, 1))}
+			</p>
+			<p class="text-base-content/70 text-center text-sm">
+				Potencionalny Zisk: {Math.round(getEstimatedPayoutIndex(moneyToBet, 1) * money - money)}
+			</p>
+		{/if}
 	</div>
 </div>
