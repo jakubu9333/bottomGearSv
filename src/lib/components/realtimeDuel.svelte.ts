@@ -7,6 +7,7 @@ export class RealtimeDuel {
   private allMoney: { value: number; };
   private secondMoney: { value: number; };
   private firstMoney: { value: number; };
+  private isBetted: { value: boolean; };
   constructor() {
     const defaultDuel = { firstName: "", secondName: "", id: 0 }
     this.duel = createPersistentStore<Duel>("duel", defaultDuel)
@@ -21,9 +22,8 @@ export class RealtimeDuel {
     this.allMoney = createPersistentStore("allMoney", 0)
     this.firstMoney = createPersistentStore("firstMoney", 0)
     this.secondMoney = createPersistentStore("secondMoney", 0)
-    $inspect(this.allMoney)
-    $inspect(this.firstMoney)
-    $inspect(this.secondMoney)
+    this.secondMoney = createPersistentStore("secondMoney", 0)
+    this.isBetted = createPersistentStore<boolean>('isBetted', false);
   }
 
   setDuel = (duel: Duel) => {
@@ -40,6 +40,10 @@ export class RealtimeDuel {
     }
   }
 
+  getIsBetted = () => {
+    return this.isBetted.value
+  }
+
   resetBet = () => {
     console.log("reset bet")
     const defaultBetItem = {
@@ -50,7 +54,9 @@ export class RealtimeDuel {
     this.firstMoney.value = 0
     this.secondMoney.value = 0
     this.betItem.value = defaultBetItem
+    this.isBetted.value = true
   }
+
 
   getEstimatedPayoutIndex = (money: number, index: number) => {
     if (index === 0) {
@@ -73,6 +79,7 @@ export class RealtimeDuel {
 
   addMybet = (money: number, winner: string) => {
     this.betItem.value = { name: winner, money }
+    this.isBetted.value = true
     //bet comes from socket when validated
     //this.addBet(money, winner)
   }

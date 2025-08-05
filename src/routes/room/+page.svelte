@@ -14,7 +14,6 @@
 	const betDataHolder = new RealtimeDuel();
 	let userId = data.user.id;
 	const savedRound = createPersistentStore('round', data.room.round);
-	const isBetted = createPersistentStore<boolean>('isBetted', false);
 	const moneyBeforeBet = createPersistentStore<number>('beforeWinMoney', data.user.money);
 	let webSocket: WebSocket | undefined = $state(undefined);
 	let index = $state(0);
@@ -43,20 +42,26 @@
 	});
 
 	function resetBet() {
-		isBetted.value = false;
 		betDataHolder.resetBet();
 	}
 
-	//update
+	function nextState(eventType: EventType) {
+		const state = getNextTransition(eventType, roomState);
+		let round = savedRound.value;
+		if (state === AppState.RoundEnded) {
+			round++;
+		}
+		updateAppToState(state, round);
+	}
+
 	function updateAppToState(state: AppState, round: number) {
 		const canResetBet = savedRound.value !== round || state === AppState.RoundEnded;
 		if (canResetBet) {
 			resetBet();
 		}
 		const isBetDuelRound = state === AppState.DuelBetStart;
-		if (isBetDuelRound && isBetted.value) {
+		if (isBetDuelRound && betDataHolder.getIsBetted()) {
 			state = AppState.DuelBetPlaced;
-			console.log(isBetted.value);
 		}
 		if (state === AppState.DuelBetStart) {
 			moneyBeforeBet.value = money;
@@ -96,23 +101,12 @@
 
 	async function makeBetStateDuel() {
 		nextState(EventType.DuelBetPlaced);
-		isBetted.value = true;
-		console.log('isBetted', isBetted.value);
 	}
 
 	let derivedAppState = $derived(
 		roomState === AppState.DuelBetPlaced ? AppState.DuelBetEnded : roomState
 	);
 
-	//update socket
-	function nextState(eventType: EventType) {
-		const state = getNextTransition(eventType, roomState);
-		let round = savedRound.value;
-		if (state === AppState.RoundEnded) {
-			round++;
-		}
-		updateAppToState(state, round);
-	}
 	let moneyDiff = $derived(money - moneyBeforeBet.value);
 </script>
 
@@ -144,7 +138,7 @@
 					/>
 				{:else if derivedAppState === AppState.DuelBetEnded}
 					<div class="space-y-2 text-center">
-						{#if !isBetted.value}
+						{#if !betDataHolder.getIsBetted()}
 							<h2 class="text-warning text-xl font-bold">⚠️ Nezaregistrovaná stávka</h2>
 							<p class="text-base-content/70 text-sm">Počkaj na koniec kola</p>
 						{:else}
