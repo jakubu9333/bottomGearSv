@@ -1,20 +1,17 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { PageProps } from '../$types';
+	import type { JoinEvent } from '$lib/types';
 	let { data }: PageProps = $props();
 
 	let users: { name: string }[] = $state(data.users);
 	let room = data.room;
 
 	let socket: WebSocket | null = $state(null);
-	type JoinEvent = {
-		type: 'join';
-		user: string;
-	};
 	onMount(() => {
 		//const socketUrl = 'wss://bottomgear.uhlo.workers.dev';
 		const socketUrl = 'ws://localhost:8787';
-		socket = new WebSocket(`{socketUrl}/admin/room/${room.id}/ws`);
+		socket = new WebSocket(`${socketUrl}/admin/room/${room.id}/ws`);
 		if (socket) {
 			socket.addEventListener('open', (_) => {
 				console.log('open');

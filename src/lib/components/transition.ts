@@ -1,4 +1,4 @@
-import { AppState } from "$lib";
+import { AppState, EventType } from "$lib/types";
 
 export function getNextTransition(eventType: EventType, appState: AppState): AppState {
   if ((appState === AppState.NoRound || appState === AppState.RoundEnded) && eventType === EventType.DuelBetStart) {
@@ -19,9 +19,3 @@ export function getNextTransition(eventType: EventType, appState: AppState): App
 }
 
 
-export enum EventType {
-  DuelBetStart,
-  DuelBetPlaced,
-  DuelBetEnd,
-  RoundEnd,
-}

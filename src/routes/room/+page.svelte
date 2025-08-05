@@ -1,25 +1,23 @@
 <script lang="ts">
-	import { AppState } from '$lib';
+	import { AppState, EventType, type EventEvent, type BetingEvent } from '$lib/types';
 	import { createPersistentStore } from '$lib/persistentStorage.svelte';
 	import type { PageProps } from './$types';
 	import { onMount } from 'svelte';
 	import DuelScreen from '$lib/components/DuelScreen.svelte';
-	import { EventType, getNextTransition } from '$lib/components/transition';
+	import { getNextTransition } from '$lib/components/transition';
 	import { fade } from 'svelte/transition';
 	import { RealtimeDuel } from '$lib/components/realtimeDuel.svelte';
 
 	let { data }: PageProps = $props();
 	let roomState = $state(data.room.state);
 	let money = $state(data.user.money);
-	let round = $state(data.room.round);
 	const betDataHolder = new RealtimeDuel();
 	let userId = data.user.id;
 	const savedRound = createPersistentStore('round', data.room.round);
 	const isBetted = createPersistentStore<boolean>('isBetted', false);
 	const moneyBeforeBet = createPersistentStore<number>('beforeWinMoney', data.user.money);
 	let webSocket: WebSocket | undefined = $state(undefined);
-	type EventEvent = { type: 'event'; event: EventType };
-	type BetingEvent = { type: 'bet'; money: number; winner: string };
+	let index = $state(0);
 	onMount(() => {
 		if (roomState !== AppState.NoRound) {
 			updateAppToState(roomState, data.room.round);
@@ -46,10 +44,11 @@
 
 	function resetBet() {
 		isBetted.value = false;
+		betDataHolder.resetBet();
 	}
 
-	//update refresh
-	function updateAppToState(state: number, round: number) {
+	//update
+	function updateAppToState(state: AppState, round: number) {
 		const canResetBet = savedRound.value !== round || state === AppState.RoundEnded;
 		if (canResetBet) {
 			resetBet();
@@ -68,7 +67,6 @@
 		savedRound.value = round;
 
 		roomState = state;
-		round = round;
 	}
 
 	async function getLeaderBoard(): Promise<{ money: number; id: number; name: string }[] | null> {
@@ -90,6 +88,10 @@
 		leaderBoard = newLeaderBoard;
 		const me = newLeaderBoard.find((item) => item.id === data.user.id);
 		money = me?.money ?? 0;
+		if (!me) {
+			return;
+		}
+		index = newLeaderBoard.indexOf(me) + 1;
 	}
 
 	async function makeBetStateDuel() {
@@ -103,17 +105,13 @@
 	);
 
 	//update socket
-	async function nextState(eventType: EventType) {
-		roomState = getNextTransition(eventType, roomState);
-		if (roomState === AppState.DuelBetStart) {
-			moneyBeforeBet.value = money;
-		}
-		if (roomState === AppState.RoundEnded) {
-			getWin();
+	function nextState(eventType: EventType) {
+		const state = getNextTransition(eventType, roomState);
+		let round = savedRound.value;
+		if (state === AppState.RoundEnded) {
 			round++;
-			savedRound.value = round;
-			resetBet();
 		}
+		updateAppToState(state, round);
 	}
 	let moneyDiff = $derived(money - moneyBeforeBet.value);
 </script>
@@ -173,6 +171,9 @@
 
 						<p class="text-base-content/70 text-sm">
 							Aktuálny stav: <span class="font-bold">{money}</span>
+						</p>
+						<p class="text-base-content/70 text-sm">
+							Si na <span class="font-bold">{index}. </span> mieste
 						</p>
 
 						<div class="mt-4 text-left">

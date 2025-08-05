@@ -1,7 +1,7 @@
 import { eq, sql } from "drizzle-orm"
 import { db } from "."
 import { room, user } from "./schema"
-import { AppState } from "$lib"
+import { AppState } from "$lib/types"
 
 
 export const getRoomByName = async (env: Env, name: string) => {

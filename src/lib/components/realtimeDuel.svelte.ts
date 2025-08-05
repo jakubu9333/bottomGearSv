@@ -21,6 +21,9 @@ export class RealtimeDuel {
     this.allMoney = createPersistentStore("allMoney", 0)
     this.firstMoney = createPersistentStore("firstMoney", 0)
     this.secondMoney = createPersistentStore("secondMoney", 0)
+    $inspect(this.allMoney)
+    $inspect(this.firstMoney)
+    $inspect(this.secondMoney)
   }
 
   setDuel = (duel: Duel) => {
@@ -37,14 +40,23 @@ export class RealtimeDuel {
     }
   }
 
+  resetBet = () => {
+    console.log("reset bet")
+    const defaultBetItem = {
+      name: '',
+      money: 0
+    };
+    this.allMoney.value = 0
+    this.firstMoney.value = 0
+    this.secondMoney.value = 0
+    this.betItem.value = defaultBetItem
+  }
+
   getEstimatedPayoutIndex = (money: number, index: number) => {
-    if (money === 0) {
-      return 1
-    }
     if (index === 0) {
-      return (this.allMoney.value + money) / (this.firstMoney.value + money)
+      return (this.allMoney.value + money) / Math.max(this.firstMoney.value + money, 1)
     }
-    return (this.allMoney.value + money) / (this.secondMoney.value + money)
+    return (this.allMoney.value + money) / Math.max(this.secondMoney.value + money, 1)
   }
 
 
@@ -61,7 +73,8 @@ export class RealtimeDuel {
 
   addMybet = (money: number, winner: string) => {
     this.betItem.value = { name: winner, money }
-    this.addBet(money, winner)
+    //bet comes from socket when validated
+    //this.addBet(money, winner)
   }
 
   getBetItem = () => {

@@ -4,6 +4,11 @@
 		money: number;
 	};
 	let { moneyToBet = $bindable(), money }: Props = $props();
+	$effect(() => {
+		if (moneyToBet > money) {
+			moneyToBet = money;
+		}
+	});
 </script>
 
 <div class="form-control">

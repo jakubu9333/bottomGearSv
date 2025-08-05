@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import MoneyInput from './MoneyInput.svelte';
-	import type { Duel } from '$lib/types';
+	import DuelButton from './DuelButton.svelte';
+	import type { Duel, DuelParticipant } from '$lib/types';
 	let {
 		money = $bindable(),
 		setBetItem,
@@ -39,8 +40,21 @@
 			return;
 		}
 		duel.value = duelData;
+		participants = [
+			{
+				name: duelData.firstName,
+				winnerIndex: 0,
+				buttonClass: 'btn-primary'
+			},
+			{
+				name: duelData.secondName,
+				winnerIndex: 1,
+				buttonClass: 'btn-secondary'
+			}
+		] satisfies DuelParticipant[];
 		setDuel(duelData);
 	});
+	let participants: DuelParticipant[] = $state([]);
 	let errorLook = $state(false);
 	let moneyWarning = $state(false);
 
@@ -50,7 +64,7 @@
 			return;
 		}
 		moneyWarning = false;
-		if (duel.value === null || winnerIndex === undefined) {
+		if (duel === null || duel.value === null || winnerIndex === undefined) {
 			return;
 		}
 		let winner;
@@ -72,7 +86,7 @@
 			errorLook = true;
 			return;
 		}
-		setBetItem(money, winner);
+		setBetItem(moneyToBet, winner);
 		money -= moneyToBet;
 		makeBetState();
 
@@ -93,34 +107,13 @@
 		</div>
 	{/if}
 
+	<p class="text-base-content/70 text-sm">
+		Aktuálny stav: <span class="font-bold">{money}</span>
+	</p>
 	<MoneyInput {money} bind:moneyToBet />
 	<div class="flex flex-col gap-4">
-		<button class="btn btn-primary w-full" disabled={!duel.value} onclick={() => duelBet(0)}>
-			{duel.value?.firstName ?? 'Hráč 1'}
-		</button>
-		{#if duel.value}
-			<p class="text-base-content/70 text-center text-sm">
-				Kurz: {Math.round(getEstimatedPayoutIndex(moneyToBet, 0))}
-			</p>
-			<p class="text-base-content/70 text-center text-sm">
-				Potencionalny Zisk: {Math.round(getEstimatedPayoutIndex(moneyToBet, 0) * money - money)}
-			</p>
-		{/if}
-		<button
-			class="btn btn-secondary w-full justify-between"
-			disabled={!duel.value}
-			onclick={() => duelBet(1)}
-		>
-			<p class="font-semibold">{duel.value?.secondName}</p>
-			<span class="text-sm">Stav</span>
-		</button>
-		{#if duel.value}
-			<p class="text-base-content/70 text-center text-sm">
-				Kurz: {Math.round(getEstimatedPayoutIndex(moneyToBet, 1))}
-			</p>
-			<p class="text-base-content/70 text-center text-sm">
-				Potencionalny Zisk: {Math.round(getEstimatedPayoutIndex(moneyToBet, 1) * money - money)}
-			</p>
-		{/if}
+		{#each participants as participant}
+			<DuelButton {duelBet} money={moneyToBet} {participant} {getEstimatedPayoutIndex} />
+		{/each}
 	</div>
 </div>

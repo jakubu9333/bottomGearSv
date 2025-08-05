@@ -1,7 +1,8 @@
-import { EventType } from "$lib/components/transition";
+import { dev } from "$app/environment";
+import { EventType } from "$lib/types";
 import { createNewDuel } from "$lib/server/db/duel";
 import { addDuelInRoom } from "$lib/server/db/room";
-import { getDurrableObject } from "$lib/server/durrable";
+import { getDurrableObject, mockDurableForDev } from "$lib/server/durrable";
 import type { RequestHandler } from "@sveltejs/kit";
 
 
@@ -14,8 +15,13 @@ export const POST: RequestHandler = async ({ request, locals, platform }) => {
 	}
 	const newDuel = await createNewDuel(env, duel.firstName, duel.secondName)
 	const room = await addDuelInRoom(env, locals.userId, newDuel.id)
-	const durableObject = getDurrableObject(env, room.id)
-	await durableObject.sendEventSocket(EventType.DuelBetStart)
+	const eventToSend = EventType.DuelBetStart
+	if (dev) {
+		await mockDurableForDev({ type: "event", event: eventToSend })
+	} else {
+		const durableObject = getDurrableObject(env, room.id)
+		await durableObject.sendEventSocket(eventToSend)
+	}
 
 	return Response.json(newDuel)
 }

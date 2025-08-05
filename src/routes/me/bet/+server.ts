@@ -3,7 +3,8 @@ import { getUser } from "$lib/server/db/user";
 import { getDuelById } from "$lib/server/db/duel";
 import { removeUserMoney } from "$lib/server/db/user";
 import type { RequestHandler } from "@sveltejs/kit";
-import { getDurrableObject } from "$lib/server/durrable";
+import { getDurrableObject, mockDurableForDev } from "$lib/server/durrable";
+import { dev } from "$app/environment";
 
 
 type Bet = { winner: string, money: number, duelId: number }
@@ -35,8 +36,13 @@ export const POST: RequestHandler = async ({ request, locals, platform }) => {
         locals.userId)
     await removeUserMoney(env, locals.userId, betFromJson.money)
 
-    const durableObject = getDurrableObject(env, user.roomId)
-    await durableObject.sendBettedInfo(betFromJson.money, betFromJson.winner)
+    if (dev) {
+        await mockDurableForDev({ type: "bet", money: betFromJson.money, winner: betFromJson.winner })
+    }
+    else {
+        const durableObject = getDurrableObject(env, user.roomId)
+        await durableObject.sendBettedInfo(betFromJson.money, betFromJson.winner)
+    }
 
 
     return Response.json(bet)

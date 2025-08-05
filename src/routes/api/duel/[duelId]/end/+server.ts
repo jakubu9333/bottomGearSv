@@ -1,9 +1,10 @@
-import { EventType } from "$lib/components/transition";
+import { dev } from "$app/environment";
+import { EventType } from "$lib/types"
 import { setWinnerMoney } from "$lib/server/db/bet";
 import { setWinner } from "$lib/server/db/duel";
 import { endDuelRoundInRoom } from "$lib/server/db/room";
 import { giveFreeMoneyToBrokeBoys } from "$lib/server/db/user";
-import { getDurrableObject } from "$lib/server/durrable";
+import { getDurrableObject, mockDurableForDev } from "$lib/server/durrable";
 import type { RequestHandler } from "@sveltejs/kit";
 
 export const POST: RequestHandler = async ({ platform, locals, params, request }) => {
@@ -13,12 +14,16 @@ export const POST: RequestHandler = async ({ platform, locals, params, request }
 	if (!winner.winner) {
 		return new Response(JSON.stringify({ message: "winner not set" }), { status: 400 })
 	}
-	const duel = await setWinner(env, params.duelId, winner.winner)
-	//@ts-ignore
+	await setWinner(env, +params.duelId, winner.winner)
 	const users = await setWinnerMoney(env, +params.duelId, winner.winner)
 	await giveFreeMoneyToBrokeBoys(env, room.id)
-	const durableObject = getDurrableObject(env, room.id)
-	await durableObject.sendEventSocket(EventType.RoundEnd)
+	const eventToSend = EventType.RoundEnd
+	if (dev) {
+		await mockDurableForDev({ type: "event", event: eventToSend })
+	} else {
+		const durableObject = getDurrableObject(env, room.id)
+		await durableObject.sendEventSocket(eventToSend)
+	}
 
 	return Response.json(users)
 
