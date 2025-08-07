@@ -149,6 +149,11 @@
 							<p class="text-base-content/70 text-sm">
 								Predpokladana vyhra je {Math.ceil(betDataHolder?.getMyEstimatedPayout())}
 							</p>
+							<p class="text-base-content/70 text-sm">
+								Predpokladany zisk je {Math.ceil(
+									betDataHolder?.getMyEstimatedPayout() - betDataHolder.getBetItem().money
+								)}
+							</p>
 							<p class="text-base-content/70 text-sm">Počkaj na koniec kola</p>
 						{/if}
 					</div>
