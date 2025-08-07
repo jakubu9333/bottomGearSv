@@ -17,7 +17,6 @@
 				console.log('open');
 			});
 			socket.addEventListener('message', (ev: MessageEvent<string>) => {
-				console.log(ev);
 				const socketData: JoinEvent = JSON.parse(ev.data);
 				if (socketData.type == 'join') {
 					users.push({ name: socketData.user });

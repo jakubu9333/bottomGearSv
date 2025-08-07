@@ -12,8 +12,10 @@
 		duelBet: (winnerIndex: number) => void;
 		participant: DuelParticipant;
 	} = $props();
-	let kurz = $derived(getEstimatedPayoutIndex(money, participant.winnerIndex));
-	let payout = $derived(getEstimatedPayoutIndex(money, participant.winnerIndex) * money - money);
+	let kurz = $derived(getEstimatedPayoutIndex(money, participant.winnerIndex).toFixed(2));
+	let payout = $derived(
+		Math.ceil(getEstimatedPayoutIndex(money, participant.winnerIndex) * money - money)
+	);
 </script>
 
 <button

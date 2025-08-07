@@ -45,7 +45,6 @@ export class RealtimeDuel {
   }
 
   resetBet = () => {
-    console.log("reset bet")
     const defaultBetItem = {
       name: '',
       money: 0
@@ -54,7 +53,7 @@ export class RealtimeDuel {
     this.firstMoney.value = 0
     this.secondMoney.value = 0
     this.betItem.value = defaultBetItem
-    this.isBetted.value = true
+    this.isBetted.value = false
   }
 
 

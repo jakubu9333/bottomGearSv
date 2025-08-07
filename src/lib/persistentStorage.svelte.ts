@@ -5,8 +5,6 @@ export function createPersistentStore<T>(key: string, startValue: T) {
     storedValue = window.localStorage.getItem(key);
   }
 
-  console.log("storred", storedValue, "start", startValue)
-
   let store = $state(storedValue ? JSON.parse(storedValue) as T : startValue);
 
   $effect(() => {

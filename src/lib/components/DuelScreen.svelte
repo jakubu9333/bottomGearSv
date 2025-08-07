@@ -30,7 +30,6 @@
 			return null;
 		}
 		const body: Duel = await response.json();
-		console.log(body);
 		return body;
 	}
 

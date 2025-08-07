@@ -29,7 +29,6 @@
 				console.log('open');
 			});
 			webSocket.addEventListener('message', (ev: MessageEvent<string>) => {
-				console.log(ev);
 				const socketData: EventEvent | BetingEvent = JSON.parse(ev.data);
 				if (socketData.type == 'event') {
 					nextState(socketData.event);
@@ -148,7 +147,7 @@
 								<span class="font-semibold">{betDataHolder?.getBetItem().name}</span>
 							</p>
 							<p class="text-base-content/70 text-sm">
-								Predpokladana vyhra je {betDataHolder?.getMyEstimatedPayout()}
+								Predpokladana vyhra je {Math.ceil(betDataHolder?.getMyEstimatedPayout())}
 							</p>
 							<p class="text-base-content/70 text-sm">Počkaj na koniec kola</p>
 						{/if}
