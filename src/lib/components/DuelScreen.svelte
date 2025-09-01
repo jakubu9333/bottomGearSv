@@ -1,23 +1,28 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import MoneyInput from './MoneyInput.svelte';
+	import DuelButton from './DuelButton.svelte';
+	import type { Duel, DuelParticipant } from '$lib/types';
 	let {
 		money = $bindable(),
-		betItemToShow = $bindable(),
+		setBetItem,
+		setDuel,
 		makeBetState,
+		getEstimatedPayoutIndex,
 		roomId
 	}: {
 		money: number;
 		userId: number;
 		roomId: number;
-		betItemToShow: { name: string; money: number };
+		setDuel: (duel: Duel) => void;
+		setBetItem: (money: number, name: string) => void;
+		getEstimatedPayoutIndex: (money: number, index: number) => number;
 		makeBetState: () => void;
 	} = $props();
 	let moneyToBet = $state(0);
 	let duel: {
 		value: null | Duel;
 	} = $state({ value: null });
-	type Duel = { id: number; firstName: string; secondName: string };
 
 	async function getDuel(): Promise<Duel | null> {
 		const response = await fetch(`/room/${roomId}/duel`);
@@ -25,7 +30,6 @@
 			return null;
 		}
 		const body: Duel = await response.json();
-		console.log(body);
 		return body;
 	}
 
@@ -35,18 +39,38 @@
 			return;
 		}
 		duel.value = duelData;
+		participants = [
+			{
+				name: duelData.firstName,
+				winnerIndex: 0,
+				buttonClass: 'btn-primary'
+			},
+			{
+				name: duelData.secondName,
+				winnerIndex: 1,
+				buttonClass: 'btn-secondary'
+			}
+		] satisfies DuelParticipant[];
+		setDuel(duelData);
 	});
+	let participants: DuelParticipant[] = $state([]);
 	let errorLook = $state(false);
 	let moneyWarning = $state(false);
 
-	async function duelBet(winner: string | undefined) {
+	async function duelBet(winnerIndex: number | undefined) {
 		if (moneyToBet === 0) {
 			moneyWarning = true;
 			return;
 		}
 		moneyWarning = false;
-		if (duel.value === null || winner === undefined) {
+		if (duel === null || duel.value === null || winnerIndex === undefined) {
 			return;
+		}
+		let winner;
+		if (winnerIndex === 0) {
+			winner = duel.value.firstName;
+		} else {
+			winner = duel.value.secondName;
 		}
 		errorLook = false;
 		const betResponse = await fetch('/me/bet', {
@@ -61,9 +85,7 @@
 			errorLook = true;
 			return;
 		}
-		const bettedFor = winner;
-		betItemToShow.name = bettedFor;
-		betItemToShow.money = moneyToBet;
+		setBetItem(moneyToBet, winner);
 		money -= moneyToBet;
 		makeBetState();
 
@@ -80,25 +102,17 @@
 	{/if}
 	{#if moneyWarning}
 		<div class="alert alert-warning">
-			<span>⚠️ NStavka s nulou nie je povolená.</span>
+			<span>⚠️ Stavka s nulou nie je povolená.</span>
 		</div>
 	{/if}
 
+	<p class="text-base-content/70 text-sm">
+		Aktuálny stav: <span class="font-bold">{money}</span>
+	</p>
 	<MoneyInput {money} bind:moneyToBet />
 	<div class="flex flex-col gap-4">
-		<button
-			class="btn btn-primary w-full"
-			disabled={!duel.value}
-			onclick={() => duelBet(duel.value?.firstName)}
-		>
-			{duel.value?.firstName ?? 'Hráč 1'}
-		</button>
-		<button
-			class="btn btn-secondary w-full"
-			disabled={!duel.value}
-			onclick={() => duelBet(duel.value?.secondName)}
-		>
-			{duel.value?.secondName ?? 'Hráč 2'}
-		</button>
+		{#each participants as participant}
+			<DuelButton {duelBet} money={moneyToBet} {participant} {getEstimatedPayoutIndex} />
+		{/each}
 	</div>
 </div>

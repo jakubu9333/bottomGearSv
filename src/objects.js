@@ -45,13 +45,20 @@ export class BottomGearObject extends DurableObject {
 		for (const socket of this.ctx.getWebSockets()) {
 			socket.send(JSON.stringify({ type: "join", user: name }))
 		}
-		return `XXX ${name}`
+		return `done`
 
 	}
 
 	async sendEventSocket(eventType) {
 		for (const socket of this.ctx.getWebSockets()) {
 			socket.send(JSON.stringify({ type: "event", event: eventType }))
+		}
+		return `done`
+
+	}
+	async sendBettedInfo(money, winner) {
+		for (const socket of this.ctx.getWebSockets()) {
+			socket.send(JSON.stringify({ type: "bet", money, winner }))
 		}
 		return `done`
 

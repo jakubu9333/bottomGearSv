@@ -25,7 +25,7 @@ export const actions = {
         }
         const result = await joinRoomByName(platform?.env!!, roomName.toString(), locals.userId);
         if ('error' in result) {
-            return fail(404, { message: result.error });
+            return fail(404, { error: result.error });
         }
         throw redirect(303, `/room`)
     }

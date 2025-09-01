@@ -1,69 +1,69 @@
 <script lang="ts">
-	import { AppState } from '$lib';
+	import { AppState, EventType, type EventEvent, type BetingEvent } from '$lib/types';
 	import { createPersistentStore } from '$lib/persistentStorage.svelte';
 	import type { PageProps } from './$types';
 	import { onMount } from 'svelte';
 	import DuelScreen from '$lib/components/DuelScreen.svelte';
-	import { EventType, getNextTransition } from '$lib/components/transition';
+	import { getNextTransition } from '$lib/components/transition';
 	import { fade } from 'svelte/transition';
+	import { RealtimeDuel } from '$lib/components/realtimeDuel.svelte';
 
 	let { data }: PageProps = $props();
 	let roomState = $state(data.room.state);
 	let money = $state(data.user.money);
-	let round = $state(data.room.round);
+	const betDataHolder = new RealtimeDuel();
 	let userId = data.user.id;
 	const savedRound = createPersistentStore('round', data.room.round);
-	const isBetted = createPersistentStore<boolean>('isBetted', false);
 	const moneyBeforeBet = createPersistentStore<number>('beforeWinMoney', data.user.money);
-	const defaultBetItem = {
-		name: '',
-		money: 0
-	};
-	const betItemToShow: { value: { name: string; money: number } } = createPersistentStore(
-		'betItem',
-		defaultBetItem
-	);
 	let webSocket: WebSocket | undefined = $state(undefined);
-	type EventEvent = { type: 'event'; event: EventType };
+	let index = $state(0);
 	onMount(() => {
 		if (roomState !== AppState.NoRound) {
 			updateAppToState(roomState, data.room.round);
 		}
-		const url = 'bottomgear.uhlo.workers.dev';
-		//const url = localhost:8787
-		webSocket = new WebSocket(`wss://${url}/room/${data?.room?.id ?? '0'}/ws`);
+		//const socketUrl = 'wss://bottomgear.uhlo.workers.dev';
+		const socketUrl = 'ws://localhost:8787';
+		webSocket = new WebSocket(`${socketUrl}/room/${data?.room?.id ?? '0'}/ws`);
 		if (webSocket) {
 			webSocket.addEventListener('open', (_) => {
 				console.log('open');
 			});
 			webSocket.addEventListener('message', (ev: MessageEvent<string>) => {
-				console.log(ev);
-				const socketData: EventEvent = JSON.parse(ev.data);
+				const socketData: EventEvent | BetingEvent = JSON.parse(ev.data);
 				if (socketData.type == 'event') {
 					nextState(socketData.event);
+				}
+				if (socketData.type == 'bet') {
+					betDataHolder?.addBet(socketData.money, socketData.winner);
 				}
 			});
 		}
 	});
 
 	function resetBet() {
-		betItemToShow.value = defaultBetItem;
-		isBetted.value = false;
+		betDataHolder.resetBet();
 	}
 
-	//update refresh
-	function updateAppToState(state: number, round: number) {
+	function nextState(eventType: EventType) {
+		const state = getNextTransition(eventType, roomState);
+		let round = savedRound.value;
+		if (state === AppState.RoundEnded) {
+			round++;
+		}
+		updateAppToState(state, round);
+	}
+
+	function updateAppToState(state: AppState, round: number) {
 		const canResetBet = savedRound.value !== round || state === AppState.RoundEnded;
 		if (canResetBet) {
 			resetBet();
 		}
 		const isBetDuelRound = state === AppState.DuelBetStart;
-		if (isBetDuelRound && isBetted.value) {
+		if (isBetDuelRound && betDataHolder.getIsBetted()) {
 			state = AppState.DuelBetPlaced;
-			console.log(isBetted.value);
 		}
-		if (state === AppState.DuelBetStart){
-			moneyBeforeBet.value = money
+		if (state === AppState.DuelBetStart) {
+			moneyBeforeBet.value = money;
 		}
 		if (state === AppState.RoundEnded) {
 			getWin();
@@ -71,7 +71,6 @@
 		savedRound.value = round;
 
 		roomState = state;
-		round = round;
 	}
 
 	async function getLeaderBoard(): Promise<{ money: number; id: number; name: string }[] | null> {
@@ -93,31 +92,20 @@
 		leaderBoard = newLeaderBoard;
 		const me = newLeaderBoard.find((item) => item.id === data.user.id);
 		money = me?.money ?? 0;
+		if (!me) {
+			return;
+		}
+		index = newLeaderBoard.indexOf(me) + 1;
 	}
 
 	async function makeBetStateDuel() {
 		nextState(EventType.DuelBetPlaced);
-		isBetted.value = true;
-		console.log('isBetted', isBetted.value);
 	}
 
 	let derivedAppState = $derived(
 		roomState === AppState.DuelBetPlaced ? AppState.DuelBetEnded : roomState
 	);
 
-	//update socket
-	async function nextState(eventType: EventType) {
-		roomState = getNextTransition(eventType, roomState);
-		if (roomState === AppState.DuelBetStart) {
-			moneyBeforeBet.value = money;
-		}
-		if (roomState === AppState.RoundEnded) {
-			getWin();
-			round++;
-			savedRound.value = round;
-			resetBet();
-		}
-	}
 	let moneyDiff = $derived(money - moneyBeforeBet.value);
 </script>
 
@@ -140,21 +128,31 @@
 				{:else if roomState === AppState.DuelBetStart}
 					<DuelScreen
 						{userId}
+						setDuel={betDataHolder.setDuel}
 						roomId={+data.room.id}
 						bind:money
+						getEstimatedPayoutIndex={betDataHolder.getEstimatedPayoutIndex}
 						makeBetState={makeBetStateDuel}
-						bind:betItemToShow={betItemToShow.value}
+						setBetItem={betDataHolder.addMybet}
 					/>
 				{:else if derivedAppState === AppState.DuelBetEnded}
 					<div class="space-y-2 text-center">
-						{#if !isBetted.value}
+						{#if !betDataHolder.getIsBetted()}
 							<h2 class="text-warning text-xl font-bold">⚠️ Nezaregistrovaná stávka</h2>
 							<p class="text-base-content/70 text-sm">Počkaj na koniec kola</p>
 						{:else}
 							<h2 class="text-success text-xl font-bold">✅ Stávka zaregistrovaná</h2>
 							<p class="text-base-content/70 text-sm">
-								vsadil si {betItemToShow.value.money} na
-								<span class="font-semibold">{betItemToShow.value.name}</span>
+								vsadil si {betDataHolder?.getBetItem().money} na
+								<span class="font-semibold">{betDataHolder?.getBetItem().name}</span>
+							</p>
+							<p class="text-base-content/70 text-sm">
+								Predpokladana vyhra je {Math.ceil(betDataHolder?.getMyEstimatedPayout())}
+							</p>
+							<p class="text-base-content/70 text-sm">
+								Predpokladany zisk je {Math.ceil(
+									betDataHolder?.getMyEstimatedPayout() - betDataHolder.getBetItem().money
+								)}
 							</p>
 							<p class="text-base-content/70 text-sm">Počkaj na koniec kola</p>
 						{/if}
@@ -171,6 +169,9 @@
 
 						<p class="text-base-content/70 text-sm">
 							Aktuálny stav: <span class="font-bold">{money}</span>
+						</p>
+						<p class="text-base-content/70 text-sm">
+							Si na <span class="font-bold">{index}. </span> mieste
 						</p>
 
 						<div class="mt-4 text-left">

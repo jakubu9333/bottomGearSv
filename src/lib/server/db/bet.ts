@@ -5,22 +5,22 @@ import { duelBet, user } from "./schema"
 
 export const createNewBet = async (env: Env, money: number, winner: string, duelId: number, userId: number
 ) => {
-	return (await db(env).insert(duelBet).values({
-		money,
-		winner,
-		duelId,
-		userId
-	}).returning())[0]
+  return (await db(env).insert(duelBet).values({
+    money,
+    winner,
+    duelId,
+    userId
+  }).returning())[0]
 }
 
 export const getAllBetMoneyForDuel = async (env: Env, duelId: number) => {
-	const duels = (await db(env).select({ winner: duelBet.winner, money: sum(duelBet.money) }).from(duelBet).where(eq(duelBet.duelId, duelId)).groupBy(duelBet.winner))
-	return duels
+  const duels = (await db(env).select({ winner: duelBet.winner, money: sum(duelBet.money) }).from(duelBet).where(eq(duelBet.duelId, duelId)).groupBy(duelBet.winner))
+  return duels
 }
 
 export const setWinnerMoney = async (env: Env, duelId: number, winner: string) => {
-	const dbEnv = db(env)
-	const result = await dbEnv.run(sql`
+  const dbEnv = db(env)
+  const result = await dbEnv.run(sql`
     WITH bet_calculations AS (
       SELECT 
         b.user_id,
@@ -29,7 +29,7 @@ export const setWinnerMoney = async (env: Env, duelId: number, winner: string) =
         pools.winning_pool,
         CASE 
           WHEN pools.winning_pool > 0 
-          THEN (pools.total_pool * b.money) / pools.winning_pool 
+          THEN Cast(((pools.total_pool * b.money) / pools.winning_pool + 0.9999) as integer)
           ELSE 0 
         END as payout
       FROM ${duelBet} b
@@ -50,5 +50,5 @@ export const setWinnerMoney = async (env: Env, duelId: number, winner: string) =
     RETURNING ${user.id}, ${user.money}
   `);
 
-	return result.results;
+  return result.results;
 }

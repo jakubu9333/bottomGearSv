@@ -1,10 +1,10 @@
-import { createUser, createUserAdmin } from '$lib/server/db/user';
+import { createUser } from '$lib/server/db/user';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { createSession, generateSessionToken, setSessionTokenCookie } from '$lib/server/auth';
-import { createRoom, getRoomByName } from '$lib/server/db/room';
-import { getDurrableObject } from '$lib/server/durrable';
-import { ROBEK } from "$env/static/private"
+import { getRoomByName } from '$lib/server/db/room';
+import { getDurrableObject, mockDurableForDev } from '$lib/server/durrable';
+import { dev } from '$app/environment';
 
 export const actions = {
     default: async ({ cookies, request, platform }) => {
@@ -28,9 +28,12 @@ export const actions = {
         }
         user = await createUser(env, username, roomFromDb.id)
 
-        const roomDurableObject = getDurrableObject(env, roomFromDb.id)
-        const result = await roomDurableObject.joinRoom(username)
-        console.log("after stub", result)
+        if (dev) {
+            await mockDurableForDev({ type: "join", user: username })
+        } else {
+            const roomDurableObject = getDurrableObject(env, roomFromDb.id)
+            await roomDurableObject.joinRoom(username)
+        }
         const token = generateSessionToken();
         const session = await createSession(platform.env, token, user.id);
         setSessionTokenCookie(cookies, token, session.expiresAt);
