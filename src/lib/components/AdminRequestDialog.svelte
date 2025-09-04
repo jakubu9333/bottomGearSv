@@ -1,0 +1,49 @@
+<script lang="ts">
+	import type { MoneyRequestEvent } from '$lib/types';
+
+	export let requests: MoneyRequestEvent[];
+	let dialog: HTMLDialogElement;
+
+	async function approveRequest(id: number) {
+		await fetch(`/admin/moneyreq/${id}/approve`, {
+			method: 'POST'
+		});
+		requests = requests.filter((r) => r.id !== id);
+	}
+
+	async function rejectRequest(id: number) {
+		await fetch(`/admin/moneyreq/${id}/reject`, {
+			method: 'POST'
+		});
+		requests = requests.filter((r) => r.id !== id);
+	}
+
+	export function show() {
+		dialog.showModal();
+	}
+</script>
+
+<dialog bind:this={dialog} class="modal">
+	<div class="modal-box">
+		<h3 class="text-lg font-bold">Pending Money Requests</h3>
+		<ul class="space-y-2">
+			{#each requests as request}
+				<li class="bg-base-300 flex items-center justify-between rounded px-4 py-2">
+					<span>{request.user.name} requested {request.amount} coins for {request.price}€</span>
+					<div>
+						<button class="btn btn-sm btn-ghost" onclick={() => approveRequest(request.id)}
+							>✅</button
+						>
+						<button class="btn btn-sm btn-ghost" onclick={() => rejectRequest(request.id)}
+							>❌</button
+						>
+					</div>
+				</li>
+			{/each}
+		</ul>
+		<div class="modal-action">
+			<button class="btn" onclick={() => dialog.close()}>Close</button>
+		</div>
+	</div>
+</dialog>
+

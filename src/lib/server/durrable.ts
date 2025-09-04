@@ -1,5 +1,6 @@
-import type { BetingEvent, EventEvent, JoinEvent } from "$lib/types"
+import type { SocketMessage } from "$lib/types"
 import type { BottomGearObject } from "../../objects"
+import { dev } from '$app/environment';
 
 export function getDurrableObject(env: Env, roomId: number) {
 	const durableObjectId = env.BOTTOM_GEAR_DURRABLE_OBJECT.idFromName(roomId + "")
@@ -7,7 +8,15 @@ export function getDurrableObject(env: Env, roomId: number) {
 	return roomDurableObject
 }
 
-export async function mockDurableForDev(message: EventEvent | JoinEvent | BetingEvent) {
-	await fetch(`http:\\localhost:8787/${message.type}`, { method: "POST", body: JSON.stringify(message) })
+export async function sendSocketMessage(env: Env, roomId: number, message: SocketMessage) {
+    if (dev) {
+        await mockDurableForDev(message);
+    } else {
+        const durableObject = getDurrableObject(env, roomId);
+        await durableObject.broadcast(message);
+    }
 }
 
+export async function mockDurableForDev(message: SocketMessage) {
+	await fetch(`http:\\localhost:8787/${message.type}`, { method: "POST", body: JSON.stringify(message) })
+}

@@ -1,11 +1,34 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
+	import MicrotransactionDialog from '$lib/components/MicrotransactionDialog.svelte';
+    import { onMount } from 'svelte';
+    import type { MoneyUpdateEvent } from '$lib/types';
 
 	let { data, form }: PageProps = $props();
-	const user = data.user;
+	let user = $state(data.user);
 	let wantToChangeRoom = $state(false);
 	const isAdmin = user?.isAdmin ?? false;
+	let microtransactionDialog: MicrotransactionDialog;
+
+    onMount(() => {
+        if (user.roomId) {
+            const socketUrl = 'ws://localhost:8787';
+            const socket = new WebSocket(`${socketUrl}/room/${user.roomId}/ws`);
+
+            socket.addEventListener('message', async (ev: MessageEvent<string>) => {
+                const socketData: MoneyUpdateEvent = JSON.parse(ev.data);
+                if (socketData.type === 'money_update') {
+                    if (socketData.userId === user.id) {
+                        const response = await fetch('/me');
+                        if (response.ok) {
+                            user = await response.json();
+                        }
+                    }
+                }
+            });
+        }
+    });
 </script>
 
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
@@ -16,6 +39,7 @@
 			<a href="/name" class="w-full max-w-xs">
 				<button class="btn btn-primary w-full">Zmenit meno</button>
 			</a>
+			<button class="btn btn-secondary w-full max-w-xs" onclick={() => microtransactionDialog.show()}>Ziadost o mince</button>
 			{#if user.roomId}
 				<a href="/room" class="w-full max-w-xs">
 					<button class="btn btn-primary w-full">Idem stavkovat</button>
@@ -66,3 +90,4 @@
 		</div>
 	</div>
 </div>
+<MicrotransactionDialog bind:this={microtransactionDialog} />

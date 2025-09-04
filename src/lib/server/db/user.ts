@@ -77,3 +77,11 @@ export const joinRoomByName = async (env: Env, roomName: string, userId: number)
 		return { message: "Room not found" };
 	}
 }
+
+export const getUserByName = async (env: Env, userName: string) => {
+	return (await db(env).select({ id: user.id, name: user.name, isAdmin: user.isAdmin, roomId: user.roomId, money: user.money }).from(user).where(eq(user.name, userName)))[0]
+}
+
+export const addUserMoney = async (env: Env, userId: number, money: number) => {
+	return (await db(env).update(user).set({ money: sql`${user.money} + ${money}` }).where(eq(user.id, userId)).returning())[0]
+}

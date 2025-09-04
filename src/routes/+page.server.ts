@@ -1,11 +1,21 @@
 import { createSession, generateSessionToken } from "$lib/server/auth";
 import { getUser, joinRoomByName } from "$lib/server/db/user";
+import { getPendingMoneyRequests } from "$lib/server/db/money_request";
 import { fail, redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals, platform }) => {
     const userId = locals.userId
     const user = await getUser(platform?.env!!, userId)
+
+    if (user.isAdmin) {
+        const moneyRequests = await getPendingMoneyRequests(platform?.env!!);
+        return {
+            user,
+            moneyRequests
+        }
+    }
+
     return {
         user
     }

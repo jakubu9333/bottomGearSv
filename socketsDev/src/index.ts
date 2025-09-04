@@ -59,6 +59,19 @@ app.post("/event", async (c) => {
   sendMessage({ type: "event", event })
   console.log("event", event)
 })
+
+app.post("/money_request", async (c) => {
+    const { user, amount, price, id }: { user: string, amount: number, price: number, id: number } = await c.req.json()
+    sendMessage({ type: "money_request", user, amount, price, id })
+    console.log("money_request user ", user, " amount: ", amount)
+})
+
+app.post("/money_update", async (c) => {
+    const { userId, money }: { userId: number, money: number } = await c.req.json()
+    sendMessage({ type: "money_update", userId, money })
+    console.log("money_update userId ", userId, " money: ", money)
+})
+
 app.get("/sockets", async (c) => {
   console.log("sockets", userSocket.length)
 })
@@ -69,11 +82,10 @@ serve({
   port: 8787,
 })
 
+type MoneyRequestEvent = { type: 'money_request'; user: string; amount: number; price: number, id: number };
+type MoneyUpdateEvent = { type: 'money_update'; userId: number; money: number };
 
-
-
-
-function sendMessage(message: EventEvent | BetingEvent | JoinEvent) {
+function sendMessage(message: EventEvent | BetingEvent | JoinEvent | MoneyRequestEvent | MoneyUpdateEvent) {
   userSocket.forEach(socket => {
     socket.send(JSON.stringify(message))
   })
@@ -93,4 +105,3 @@ type JoinEvent = {
 };
 
 let userSocket: WSContext<unknown>[] = []
-

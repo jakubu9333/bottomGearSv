@@ -4,9 +4,14 @@ export type DuelParticipant = {
 	winnerIndex: number;
 	buttonClass: string;
 };
-export type EventEvent = { type: 'event'; event: EventType };
-export type BetingEvent = { type: 'bet'; money: number; winner: string };
-export type JoinEvent = { type: 'join'; user: string; };
+
+export type User = {
+    id: number;
+    name: string;
+    isAdmin: number;
+    roomId: number;
+    money: number;
+};
 
 export enum EventType {
 	DuelBetStart,
@@ -22,3 +27,18 @@ export enum AppState {
 	DuelBetEnded,
 	RoundEnded,
 }
+
+export enum MessageType {
+    Event = 'event',
+    Bet = 'bet',
+    Join = 'join',
+    MoneyRequest = 'money_request',
+    MoneyUpdate = 'money_update',
+}
+
+export type SocketMessage = 
+    | { type: MessageType.Event; event: EventType }
+    | { type: MessageType.Bet; money: number; winner: string }
+    | { type: MessageType.Join; user: string }
+    | { type: MessageType.MoneyRequest; user: string; amount: number; price: number, id: number }
+    | { type: MessageType.MoneyUpdate; userId: number; money: number };
