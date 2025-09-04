@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { AppState, EventType, type EventEvent, type BetingEvent } from '$lib/types';
+	import { AppState, EventType, type SocketMessage } from '$lib/types';
 	import { createPersistentStore } from '$lib/persistentStorage.svelte';
 	import type { PageProps } from './$types';
 	import { onMount } from 'svelte';
@@ -7,12 +7,15 @@
 	import { getNextTransition } from '$lib/components/transition';
 	import { fade } from 'svelte/transition';
 	import { RealtimeDuel } from '$lib/components/realtimeDuel.svelte';
+	import Header from '$lib/components/Header.svelte';
 
 	let { data }: PageProps = $props();
 	let roomState = $state(data.room.state);
 	let money = $state(data.user.money);
 	const betDataHolder = new RealtimeDuel();
 	let userId = data.user.id;
+	let user = $state(data.user);
+	let moneyRequests = $state(data.moneyRequests || []);
 	const savedRound = createPersistentStore('round', data.room.round);
 	const moneyBeforeBet = createPersistentStore<number>('beforeWinMoney', data.user.money);
 	let webSocket: WebSocket | undefined = $state(undefined);
@@ -29,12 +32,33 @@
 				console.log('open');
 			});
 			webSocket.addEventListener('message', (ev: MessageEvent<string>) => {
-				const socketData: EventEvent | BetingEvent = JSON.parse(ev.data);
+				const socketData: SocketMessage = JSON.parse(ev.data);
 				if (socketData.type == 'event') {
 					nextState(socketData.event);
 				}
 				if (socketData.type == 'bet') {
 					betDataHolder?.addBet(socketData.money, socketData.winner);
+				}
+				if (socketData.type === 'money_request') {
+					moneyRequests.push({
+						id: socketData.id,
+						amount: socketData.amount,
+						price: socketData.price,
+						status: 'pending',
+						user: {
+							id: 0, // We don't have the user id here
+							name: socketData.user
+						}
+					});
+				} else if (socketData.type === 'money_update') {
+					if (socketData.userId === user.id) {
+						fetch('/me').then(async (res) => {
+							if (res.ok) {
+								user = await res.json();
+								money = user.money;
+							}
+						});
+					}
 				}
 			});
 		}
@@ -109,6 +133,7 @@
 	let moneyDiff = $derived(money - moneyBeforeBet.value);
 </script>
 
+<Header bind:user bind:moneyRequests />
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
 	<div class="rounded-box bg-base-100 w-full max-w-md p-8 shadow-2xl">
 		{#key derivedAppState}
@@ -193,3 +218,4 @@
 		{/key}
 	</div>
 </div>
+
