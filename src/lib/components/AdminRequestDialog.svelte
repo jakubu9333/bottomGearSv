@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { MoneyRequestEvent } from '$lib/types';
 
-	export let requests: MoneyRequestEvent[];
+	let { requests }: { requests: MoneyRequestEvent[] } = $props();
 	let dialog: HTMLDialogElement;
 
 	async function approveRequest(id: number) {
@@ -9,6 +9,9 @@
 			method: 'POST'
 		});
 		requests = requests.filter((r) => r.id !== id);
+		if (requests.length === 0) {
+			dialog.close();
+		}
 	}
 
 	async function rejectRequest(id: number) {
@@ -16,6 +19,9 @@
 			method: 'POST'
 		});
 		requests = requests.filter((r) => r.id !== id);
+		if (requests.length === 0) {
+			dialog.close();
+		}
 	}
 
 	export function show() {
