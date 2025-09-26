@@ -34,7 +34,7 @@
 		</div>
 		<p class="py-4">Price: {(amount * pricePerCoin).toFixed(2)}€</p>
 		<p>You can pay by cash or by bank transfer.</p>
-		<p>IBAN: {IBAN}</p>
+		<p>IBAN: {PUBLIC_IBAN}</p>
 		<p>Please include your username in the transfer description.</p>
 		<div class="modal-action">
 			<button class="btn" onclick={() => dialog.close()}>Cancel</button>
