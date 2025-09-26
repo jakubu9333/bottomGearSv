@@ -133,7 +133,7 @@
 	let moneyDiff = $derived(money - moneyBeforeBet.value);
 </script>
 
-<Header bind:user bind:moneyRequests {appState} />
+<Header bind:user bind:moneyRequests appState={roomState}/>
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
 	<div class="rounded-box bg-base-100 w-full max-w-md p-8 shadow-2xl">
 		{#key derivedAppState}
