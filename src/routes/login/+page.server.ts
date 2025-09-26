@@ -3,8 +3,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
 import { createSession, generateSessionToken, setSessionTokenCookie } from '$lib/server/auth';
 import { getRoomByName } from '$lib/server/db/room';
-import { getDurrableObject, mockDurableForDev } from '$lib/server/durrable';
-import { dev } from '$app/environment';
+import { sendSocketMessage } from '$lib/server/durrable';
 
 export const actions = {
     default: async ({ cookies, request, platform }) => {
@@ -28,16 +27,15 @@ export const actions = {
         }
         user = await createUser(env, username, roomFromDb.id)
 
-        if (dev) {
-            await mockDurableForDev({ type: "join", user: username })
-        } else {
-            const roomDurableObject = getDurrableObject(env, roomFromDb.id)
-            await roomDurableObject.joinRoom(username)
-        }
+        const message = {
+            type: 'join',
+            user: username,
+        };
+        await sendSocketMessage(env, roomFromDb.id, message);
+
         const token = generateSessionToken();
         const session = await createSession(platform.env, token, user.id);
         setSessionTokenCookie(cookies, token, session.expiresAt);
         redirect(303, "/room")
     }
 } satisfies Actions;
-

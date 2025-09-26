@@ -33,4 +33,10 @@ export const duelBet = sqliteTable('duelBet', {
 	userId: integer("user_id").notNull().references(() => user.id)
 })
 
-
+export const moneyRequest = sqliteTable('moneyRequest', {
+	id: integer('id').primaryKey({ autoIncrement: true }),
+	userId: integer('user_id').notNull().references(() => user.id),
+	amount: real('amount').notNull(),
+	price: real('price').notNull(),
+	status: text('status').notNull().default('pending'), // pending, approved, rejected
+});
