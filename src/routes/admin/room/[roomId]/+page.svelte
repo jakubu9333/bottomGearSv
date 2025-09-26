@@ -9,8 +9,8 @@
 
 	let socket: WebSocket | null = $state(null);
 	onMount(() => {
-		//const socketUrl = 'wss://bottomgear.uhlo.workers.dev';
-		const socketUrl = 'ws://localhost:8787';
+		const socketUrl = 'wss://bottomgear.uhlo.workers.dev';
+		//const socketUrl = 'ws://localhost:8787';
 		socket = new WebSocket(`${socketUrl}/admin/room/${room.id}/ws`);
 		if (socket) {
 			socket.addEventListener('open', (_) => {
