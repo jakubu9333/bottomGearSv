@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { IBAN } from '$env/static/private';
+	import { IBAN } from '$env/static/public';
 	let dialog: HTMLDialogElement;
 	let amount = $state(250);
 	const pricePerCoin = 10 / 250;
