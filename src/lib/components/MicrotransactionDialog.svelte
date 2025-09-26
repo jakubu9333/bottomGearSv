@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { IBAN } from '$env/static/private';
 	let dialog: HTMLDialogElement;
 	let amount = $state(250);
 	const pricePerCoin = 10 / 250;
@@ -33,9 +34,8 @@
 		</div>
 		<p class="py-4">Price: {(amount * pricePerCoin).toFixed(2)}€</p>
 		<p>You can pay by cash or by bank transfer.</p>
-		<p>IBAN: DE89 3704 0044 0532 0130 00</p>
+		<p>IBAN: {IBAN}</p>
 		<p>Please include your username in the transfer description.</p>
-		<p>A QR code will be available soon.</p>
 		<div class="modal-action">
 			<button class="btn" onclick={() => dialog.close()}>Cancel</button>
 			<button class="btn btn-primary" onclick={requestMoney}>Confirm Request</button>
