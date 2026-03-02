@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import type { PageProps } from '../$types';
 	import type { JoinEvent } from '$lib/types';
+	import { getSocketAdress } from '$lib/socketClient';
 	let { data }: PageProps = $props();
 
 	let users: { name: string }[] = $state(data.users);
@@ -9,8 +10,7 @@
 
 	let socket: WebSocket | null = $state(null);
 	onMount(() => {
-		const socketUrl = 'wss://bottomgear.uhlo.workers.dev';
-		//const socketUrl = 'ws://localhost:8787';
+		const socketUrl = getSocketAdress();
 		socket = new WebSocket(`${socketUrl}/admin/room/${room.id}/ws`);
 		if (socket) {
 			socket.addEventListener('open', (_) => {

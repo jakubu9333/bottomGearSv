@@ -4,6 +4,7 @@
 	import type { PageProps } from './$types';
 	import { onMount } from 'svelte';
 	import DuelScreen from '$lib/components/DuelScreen.svelte';
+	import { getSocketAdress } from '$lib/socketClient';
 	import { getNextTransition } from '$lib/components/transition';
 	import { fade } from 'svelte/transition';
 	import { RealtimeDuel } from '$lib/components/realtimeDuel.svelte';
@@ -24,8 +25,8 @@
 		if (roomState !== AppState.NoRound) {
 			updateAppToState(roomState, data.room.round);
 		}
-		const socketUrl = 'wss://bottomgear.uhlo.workers.dev';
-		//const socketUrl = 'ws://localhost:8787';
+		const socketUrl = getSocketAdress();
+
 		webSocket = new WebSocket(`${socketUrl}/room/${data?.room?.id ?? '0'}/ws`);
 		if (webSocket) {
 			webSocket.addEventListener('open', (_) => {
@@ -39,7 +40,7 @@
 				if (socketData.type == 'bet') {
 					betDataHolder?.addBet(socketData.money, socketData.winner);
 				}
-				if (socketData.type === 'money_request') {
+				if (socketData.type === 'money_request' && user.isAdmin == true) {
 					moneyRequests.push({
 						id: socketData.id,
 						amount: socketData.amount,
@@ -133,7 +134,7 @@
 	let moneyDiff = $derived(money - moneyBeforeBet.value);
 </script>
 
-<Header bind:user bind:moneyRequests appState={roomState}/>
+<Header bind:user bind:moneyRequests appState={roomState} />
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
 	<div class="rounded-box bg-base-100 w-full max-w-md p-8 shadow-2xl">
 		{#key derivedAppState}
@@ -218,4 +219,3 @@
 		{/key}
 	</div>
 </div>
-

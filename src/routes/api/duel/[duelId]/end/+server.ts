@@ -1,10 +1,9 @@
-import { dev } from "$app/environment";
 import { EventType } from "$lib/types"
 import { setWinnerMoney } from "$lib/server/db/bet";
 import { setWinner } from "$lib/server/db/duel";
 import { endDuelRoundInRoom } from "$lib/server/db/room";
 import { giveFreeMoneyToBrokeBoys } from "$lib/server/db/user";
-import { getDurrableObject, mockDurableForDev } from "$lib/server/durrable";
+import { sendSocketMessage } from "$lib/server/durrable";
 import type { RequestHandler } from "@sveltejs/kit";
 
 export const POST: RequestHandler = async ({ platform, locals, params, request }) => {
@@ -18,12 +17,11 @@ export const POST: RequestHandler = async ({ platform, locals, params, request }
 	const users = await setWinnerMoney(env, +params.duelId, winner.winner)
 	await giveFreeMoneyToBrokeBoys(env, room.id)
 	const eventToSend = EventType.RoundEnd
-	if (dev) {
-		await mockDurableForDev({ type: "event", event: eventToSend })
-	} else {
-		const durableObject = getDurrableObject(env, room.id)
-		await durableObject.sendEventSocket(eventToSend)
-	}
+    const message = {
+        type: 'event',
+        event: eventToSend,
+    };
+    await sendSocketMessage(env, room.id, message);
 
 	return Response.json(users)
 
