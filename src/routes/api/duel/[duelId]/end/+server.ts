@@ -17,11 +17,11 @@ export const POST: RequestHandler = async ({ platform, locals, params, request }
 	const users = await setWinnerMoney(env, +params.duelId, winner.winner)
 	await giveFreeMoneyToBrokeBoys(env, room.id)
 	const eventToSend = EventType.RoundEnd
-    const message = {
-        type: 'event',
-        event: eventToSend,
-    };
-    await sendSocketMessage(env, room.id, message);
+	const message = {
+		type: 'event',
+		event: eventToSend,
+	};
+	await sendSocketMessage(env, room.id, message);
 
 	return Response.json(users)
 

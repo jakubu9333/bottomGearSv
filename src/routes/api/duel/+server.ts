@@ -15,11 +15,11 @@ export const POST: RequestHandler = async ({ request, locals, platform }) => {
 	const newDuel = await createNewDuel(env, duel.firstName, duel.secondName)
 	const room = await addDuelInRoom(env, locals.userId, newDuel.id)
 	const eventToSend = EventType.DuelBetStart
-    const message = {
-        type: 'event',
-        event: eventToSend,
-    };
-    await sendSocketMessage(env, room.id, message);
+	const message = {
+		type: 'event',
+		event: eventToSend,
+	};
+	await sendSocketMessage(env, room.id, message);
 
 	return Response.json(newDuel)
 }

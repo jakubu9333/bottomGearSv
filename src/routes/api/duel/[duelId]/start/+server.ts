@@ -8,10 +8,10 @@ export const POST: RequestHandler = async ({ locals, platform }) => {
 	const room = await endDuelBetting(env, locals.userId)
 
 	const eventToSend = EventType.DuelBetEnd
-    const message = {
-        type: 'event',
-        event: eventToSend,
-    };
-    await sendSocketMessage(env, room.id, message);
+	const message = {
+		type: 'event',
+		event: eventToSend,
+	};
+	await sendSocketMessage(env, room.id, message);
 	return Response.json({})
 }
