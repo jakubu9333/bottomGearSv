@@ -36,7 +36,7 @@
 	<title>Bottom Gear</title>
 </svelte:head>
 
-<div class="min-h-screen bg-base-200 font-sans">
+<div class="bg-base-200 min-h-screen font-sans">
 	<!-- Navbar -->
 	<div class="navbar bg-base-100 shadow-md">
 		<div class="flex-1">
@@ -68,15 +68,14 @@
 			<div class="hero-content text-center">
 				<div class="max-w-md">
 					<h1 class="text-5xl font-bold">Hello, {user.name}!</h1>
-					<p class="py-6">Ready to place your bets? Join a room or manage your empire.</p>
+					<p class="py-6">Ready to place your bets?</p>
 					<div class="stats bg-base-200 shadow">
 						<div class="stat">
 							<div class="stat-title">Current Balance</div>
 							<div class="stat-value text-primary">{Math.floor(user.money)} 🪙</div>
 							<div class="stat-actions">
-								<button
-									class="btn btn-success btn-sm"
-									onclick={() => microtransactionDialog.show()}>Add Funds</button
+								<button class="btn btn-success btn-sm" onclick={() => microtransactionDialog.show()}
+									>Add Funds</button
 								>
 							</div>
 						</div>
@@ -95,10 +94,10 @@
 						<div class="alert alert-success">
 							<span>You are currently in a room!</span>
 						</div>
-						<div class="card-actions justify-end mt-4">
+						<div class="card-actions mt-4 justify-end">
 							<a href="/room" class="btn btn-primary w-full">Enter Room</a>
 							<button
-								class="btn btn-outline w-full mt-2"
+								class="btn btn-outline mt-2 w-full"
 								onclick={() => (wantToChangeRoom = !wantToChangeRoom)}
 							>
 								{wantToChangeRoom ? 'Cancel Change' : 'Change Room'}
@@ -110,17 +109,12 @@
 
 					{#if !user.roomId || wantToChangeRoom}
 						<div class="divider">OR</div>
-						<form
-							method="POST"
-							action="?/joinRoom"
-							use:enhance
-							class="flex flex-col gap-4"
-						>
+						<form method="POST" action="?/joinRoom" use:enhance class="flex flex-col gap-4">
 							{#if form?.error}
 								<div role="alert" class="alert alert-error">
 									<svg
 										xmlns="http://www.w3.org/2000/svg"
-										class="stroke-current shrink-0 h-6 w-6"
+										class="h-6 w-6 shrink-0 stroke-current"
 										fill="none"
 										viewBox="0 0 24 24"
 										><path
@@ -135,13 +129,7 @@
 							{/if}
 							<label class="input input-bordered flex items-center gap-2">
 								Room
-								<input
-									type="text"
-									class="grow"
-									placeholder="Name"
-									name="roomName"
-									required
-								/>
+								<input type="text" class="grow" placeholder="Name" name="roomName" required />
 							</label>
 							<button class="btn btn-secondary w-full">Join Room</button>
 						</form>
