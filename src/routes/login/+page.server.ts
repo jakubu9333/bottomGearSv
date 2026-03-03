@@ -25,7 +25,7 @@ export const actions = {
         if (!roomFromDb) {
             return fail(400, { error: "room not found" });
         }
-        user = await createUser(env, username, roomFromDb.id)
+        user = await createUser(env, username, roomFromDb.id, roomFromDb.defaultMoney)
 
         const message = {
             type: 'join',
