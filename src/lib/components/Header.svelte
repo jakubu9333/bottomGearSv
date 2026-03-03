@@ -13,31 +13,56 @@
 	let adminRequestDialog: AdminRequestDialog | null = $state(null);
 </script>
 
-<header class="navbar bg-base-100">
+<div class="navbar bg-base-100 shadow-md">
 	<div class="flex-1">
-		<a href="/" class="btn btn-ghost text-xl normal-case">Bottom Gear</a>
+		<a href="/" class="btn btn-ghost gap-2 text-xl">
+			<span class="text-2xl">🚗</span> Bottom Gear
+		</a>
 	</div>
-	<div class="flex-none">
-		<ul class="menu menu-horizontal px-1">
-			{#if user.isAdmin}
+	<div class="flex flex-none flex-row gap-2">
+		<div class="text-primary flex items-center gap-1 px-2 font-bold">
+			{Math.floor(user.money)} 🪙
+		</div>
+		<div class="dropdown dropdown-end">
+			<div
+				tabindex="0"
+				role="button"
+				class={'btn btn-ghost btn-circle avatar placeholder' +
+					`${moneyRequests.length > 0 ? ' avatar-online' : ''}`}
+			>
+				<div class="bg-neutral text-neutral-content w-10 rounded-full">
+					<span class="text-xl">{user.name.charAt(0).toUpperCase()}</span>
+				</div>
+			</div>
+			<ul
+				tabindex="0"
+				class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+			>
+				<li><a href="/name">Change Name</a></li>
 				<li>
-					<button class="indicator" onclick={() => adminRequestDialog?.show()}>
-						{#if moneyRequests && moneyRequests.length > 0}
-							<span class="indicator-item badge badge-secondary"></span>
-						{/if}
-						Admin
-					</button>
+					<button onclick={() => microtransactionDialog?.show()}>Request Coins</button>
 				</li>
-			{/if}
-			<li>
-				<button onclick={() => microtransactionDialog?.show()}>Request coins</button>
-			</li>
-			<li>
-				<span>{user.money} coins</span>
-			</li>
-		</ul>
+				{#if user.isAdmin}
+					<li>
+						<button
+							onclick={() => adminRequestDialog?.show()}
+							disabled={moneyRequests.length == 0 || !moneyRequests}
+						>
+							Pending requests
+							{#if moneyRequests && moneyRequests.length > 0}
+								<span class="badge badge-secondary badge-sm">{moneyRequests.length}</span>
+							{/if}
+						</button>
+					</li>
+					<li>
+						<button onclick={() => alert('not implemented')}> Reset room </button>
+					</li>
+				{/if}
+			</ul>
+		</div>
 	</div>
-</header>
+</div>
+
 {#if appState === AppState.NoRound || appState === AppState.RoundEnded}
 	<MicrotransactionDialog bind:this={microtransactionDialog} />
 {/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { MoneyRequestEvent } from '$lib/types';
 
-	let { requests }: { requests: MoneyRequestEvent[] } = $props();
+	let { requests = $bindable() }: { requests: MoneyRequestEvent[] } = $props();
 	let dialog: HTMLDialogElement;
 
 	async function approveRequest(id: number) {
@@ -52,4 +52,3 @@
 		</div>
 	</div>
 </dialog>
-
