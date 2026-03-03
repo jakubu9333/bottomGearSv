@@ -19,6 +19,18 @@
 					name="room"
 				/>
 			</label>
+			<label class="form-control w-full">
+				<div class="label">
+					<span class="label-text">Defaultne love</span>
+				</div>
+				<input
+					type="text"
+					placeholder="250"
+					class="input input-bordered w-full"
+					required
+					name="defaultMoney"
+				/>
+			</label>
 
 			<button type="submit" class="btn btn-primary w-full">Vytvor roomku</button>
 		</form>

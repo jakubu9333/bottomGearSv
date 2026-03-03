@@ -14,7 +14,8 @@ export const room = sqliteTable('room', {
 	name: text().notNull(),
 	state: integer().notNull().default(0),
 	round: integer().notNull().default(0),
-	duelNow: integer("duel_now")
+	duelNow: integer("duel_now"),
+	defaultMoney: integer().notNull().default(DEFAULT_MONEY)
 });
 
 export const duel = sqliteTable('duel', {

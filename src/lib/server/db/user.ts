@@ -19,8 +19,8 @@ export const getUsersByRoomId = async (env: Env, roomId: string) => {
 	return (await db(env).select().from(user).where(eq(user.roomId, +roomId)))
 }
 
-export const createUser = async (env: Env, userName: string, roomId: number) => {
-	return (await db(env).insert(user).values({ name: userName, roomId }).returning())[0]
+export const createUser = async (env: Env, userName: string, roomId: number, money: number) => {
+	return (await db(env).insert(user).values({ name: userName, roomId, money }).returning())[0]
 }
 
 export const createUserAdmin = async (env: Env, userName: string, roomId: number) => {
@@ -64,11 +64,12 @@ export const joinRoomByName = async (env: Env, roomName: string, userId: number)
 	const dbEnv = db(env);
 
 	const roomCte = dbEnv.$with('room_cte').as(
-		dbEnv.select({ id: room.id }).from(room).where(eq(room.name, roomName))
+		dbEnv.select({ id: room.id, money: room.defaultMoney }).from(room).where(eq(room.name, roomName))
 	);
 
 	const updatedUsers = await dbEnv.with(roomCte).update(user).set({
-		roomId: sql`(select id from ${roomCte})`
+		roomId: sql`(select id from ${roomCte})`,
+		money: sql`(select money from ${roomCte})`,
 	}).where(eq(user.id, userId)).returning({ id: user.id, roomId: user.roomId });
 
 	if (updatedUsers.length > 0 && updatedUsers[0].roomId !== null) {
