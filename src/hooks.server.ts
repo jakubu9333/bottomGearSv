@@ -1,7 +1,7 @@
 
 import { validateSessionToken } from '$lib/server/auth';
 import { getUser } from '$lib/server/db/user';
-import { fail, redirect, type Handle } from '@sveltejs/kit';
+import { error, redirect, type Handle } from '@sveltejs/kit';
 import type { RequestEvent } from './routes/$types';
 
 const freeUrls = [
@@ -42,7 +42,7 @@ export const handle: Handle = async ({ event, resolve }) => {
         }
         const isUserAdmin = (await getUser(event.platform?.env!!, userId)).isAdmin
         if (!isUserAdmin) {
-            return fail(403, { message: "not admin" })
+            return error(403, { message: "not admin" })
         }
 
     }

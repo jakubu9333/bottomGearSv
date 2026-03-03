@@ -6,7 +6,7 @@ export default defineConfig({
 	plugins: [tailwindcss(), sveltekit()],
 	server: {
 		watch: {
-			ignored: ['**/local.db']
+			ignored: ['**/local.db', '**/playwright/.auth/user_bot.json']
 		}
 	}
 });
