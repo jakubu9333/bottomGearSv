@@ -32,6 +32,10 @@
 	});
 </script>
 
+<svelte:head>
+	<title>Bottom Gear</title>
+</svelte:head>
+
 <div class="min-h-screen bg-base-200 font-sans">
 	<!-- Navbar -->
 	<div class="navbar bg-base-100 shadow-md">

@@ -2,6 +2,10 @@
     import { enhance } from '$app/forms';
 </script>
 
+<svelte:head>
+    <title>Bottom Gear | Change Name</title>
+</svelte:head>
+
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
     <div class="rounded-box bg-base-100 w-full max-w-md p-8 shadow-2xl">
         <div class="flex flex-col items-center gap-6 text-center">

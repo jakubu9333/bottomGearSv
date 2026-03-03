@@ -2,6 +2,10 @@
 	import { enhance } from '$app/forms';
 </script>
 
+<svelte:head>
+	<title>Bottom Gear | Create Room</title>
+</svelte:head>
+
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
 	<div class="rounded-box bg-base-100 w-full max-w-md p-8 shadow-2xl">
 		<h1 class="mb-6 text-center text-3xl font-bold">Vytvor novu roomku</h1>
