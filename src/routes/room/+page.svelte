@@ -63,6 +63,10 @@
 				}
 			});
 		}
+
+		return () => {
+			webSocket?.close();
+		};
 	});
 
 	function resetBet() {

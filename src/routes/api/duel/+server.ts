@@ -14,6 +14,9 @@ export const POST: RequestHandler = async ({ request, locals, platform }) => {
 	}
 	const newDuel = await createNewDuel(env, duel.firstName, duel.secondName)
 	const room = await addDuelInRoom(env, locals.userId, newDuel.id)
+	if (!room) {
+		return Response.json({ message: "User not in a room" }, { status: 400 })
+	}
 	const eventToSend = EventType.DuelBetStart
 	const message = {
 		type: 'event',

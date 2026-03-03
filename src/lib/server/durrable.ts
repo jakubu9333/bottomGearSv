@@ -18,5 +18,5 @@ export async function sendSocketMessage(env: Env, roomId: number, message: Socke
 }
 
 async function mockDurableForDev(message: SocketMessage) {
-	await fetch(`http:\\localhost:8787/${message.type}`, { method: "POST", body: JSON.stringify(message) })
+	await fetch(`http://localhost:8787/${message.type}`, { method: "POST", body: JSON.stringify(message) })
 }

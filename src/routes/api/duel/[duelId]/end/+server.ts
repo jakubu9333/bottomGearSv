@@ -10,6 +10,9 @@ export const POST: RequestHandler = async ({ platform, locals, params, request }
 	const winner: { winner: string } = await request.json()
 	const env = platform?.env!!
 	const room = await endDuelRoundInRoom(env, locals.userId)
+	if (!room) {
+		return Response.json({ message: "User not in a room" }, { status: 400 })
+	}
 	if (!winner.winner) {
 		return new Response(JSON.stringify({ message: "winner not set" }), { status: 400 })
 	}

@@ -23,6 +23,10 @@
 				}
 			});
 		}
+
+		return () => {
+			socket?.close();
+		};
 	});
 </script>
 

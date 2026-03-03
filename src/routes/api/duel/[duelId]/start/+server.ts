@@ -6,6 +6,9 @@ import type { RequestHandler } from "@sveltejs/kit"
 export const POST: RequestHandler = async ({ locals, platform }) => {
 	const env = platform?.env!!
 	const room = await endDuelBetting(env, locals.userId)
+	if (!room) {
+		return Response.json({ message: "User not in a room" }, { status: 400 })
+	}
 
 	const eventToSend = EventType.DuelBetEnd
 	const message = {

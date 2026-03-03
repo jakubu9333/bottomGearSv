@@ -21,6 +21,7 @@ app.get(
       },
       onClose(_event, ws) {
         console.log("closed ws")
+        userSocket = userSocket.filter(s => s !== ws)
       }
     }
   })
@@ -36,6 +37,7 @@ app.get(
       },
       onClose(_event, ws) {
         console.log("closed ws admin")
+        userSocket = userSocket.filter(s => s !== ws)
       }
     }
   })
