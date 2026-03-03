@@ -2,7 +2,7 @@ import type { SocketMessage } from "$lib/types"
 import type { BottomGearObject } from "../../objects"
 import { dev } from '$app/environment';
 
-function getDurrableObject(env: Env, roomId: number) {
+export function getDurrableObject(env: Env, roomId: number) {
 	const durableObjectId = env.BOTTOM_GEAR_DURRABLE_OBJECT.idFromName(roomId + "")
 	const roomDurableObject: DurableObjectStub<BottomGearObject> = env.BOTTOM_GEAR_DURRABLE_OBJECT.get(durableObjectId)
 	return roomDurableObject
