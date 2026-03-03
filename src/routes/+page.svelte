@@ -39,9 +39,9 @@
 <div class="bg-base-200 min-h-screen font-sans">
 	<!-- Navbar -->
 	<div class="navbar bg-base-100 shadow-md">
-		<div class="flex-1">
-			<a href="/" class="btn btn-ghost gap-2 text-xl">
-				<span class="text-2xl">🚗</span> Bottom Gear
+		<div class="h-24 w-24 flex-1 rounded">
+			<a href="/" class="btn btn-ghost h-24 w-24 gap-2 text-xl">
+				<img src="/BG_Transparent.png" height="96" width="96" />
 			</a>
 		</div>
 		<div class="flex-none gap-2">
