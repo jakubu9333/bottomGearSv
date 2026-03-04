@@ -21,7 +21,7 @@
 	</div>
 	<div class="flex flex-none flex-row gap-2">
 		<div class="text-primary flex items-center gap-1 px-2 font-bold">
-			{Math.floor(user.money)} 🪙
+			{Math.round(user.money)} 🪙
 		</div>
 		<div class="dropdown dropdown-end">
 			<div

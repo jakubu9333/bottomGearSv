@@ -93,26 +93,34 @@
 	}
 </script>
 
-<div class="rounded-box mx-auto max-w-md space-y-6">
-	<h1 class="text-base-content text-center text-3xl font-bold">⚔️ Stávka na duel</h1>
+<div class="flex flex-col gap-6">
+	<div class="text-center">
+		<h2 class="text-base-content text-2xl font-bold uppercase tracking-tight">Nová stávka na duel</h2>
+	</div>
+
 	{#if errorLook}
-		<div class="alert alert-error">
-			<span>⚠️ Niečo sa pokazilo. Skús znova.</span>
+		<div class="alert alert-error shadow-sm py-2">
+			<span>Chyba pri spracovaní. Skús to znova.</span>
 		</div>
 	{/if}
 	{#if moneyWarning}
-		<div class="alert alert-warning">
-			<span>⚠️ Stavka s nulou nie je povolená.</span>
+		<div class="alert alert-warning shadow-sm py-2">
+			<span>Suma stávky musí byť vyššia ako nula.</span>
 		</div>
 	{/if}
 
-	<p class="text-base-content/70 text-sm">
-		Aktuálny stav: <span class="font-bold">{money}</span>
-	</p>
-	<MoneyInput {money} bind:moneyToBet />
-	<div class="flex flex-col gap-4">
-		{#each participants as participant}
-			<DuelButton {duelBet} money={moneyToBet} {participant} {getEstimatedPayoutIndex} />
-		{/each}
+	<div class="bg-base-200 flex items-center justify-center rounded-xl py-2 shadow-inner">
+		<p class="text-base-content/70 text-sm">
+			Tvoj zostatok: <span class="font-bold">{Math.round(money)} 🪙</span>
+		</p>
+	</div>
+
+	<div class="space-y-4">
+		<MoneyInput {money} bind:moneyToBet />
+		<div class="flex flex-col gap-3">
+			{#each participants as participant}
+				<DuelButton {duelBet} money={moneyToBet} {participant} {getEstimatedPayoutIndex} />
+			{/each}
+		</div>
 	</div>
 </div>

@@ -24,7 +24,6 @@
 >
 	<div class="text-center text-lg font-bold">{participant.name}</div>
 	<div class="text-sm font-normal">
-		Kurz: {kurz}| Potenciálny Zisk:
-		{Math.round(payout)}
+		Kurz: {kurz} | Možný zisk: {Math.round(payout)} 🪙
 	</div>
 </button>

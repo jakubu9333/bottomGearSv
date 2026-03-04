@@ -143,87 +143,142 @@
 </svelte:head>
 
 <Header bind:user bind:moneyRequests appState={roomState} />
-<div class="bg-base-200 flex min-h-screen items-center justify-center px-4">
-	<div class="rounded-box bg-base-100 w-full max-w-md p-8 shadow-2xl">
-		{#key derivedAppState}
-			<div
-				out:fade={{
-					duration: 400
-				}}
-				in:fade={{
-					delay: 400
-				}}
-			>
-				{#if roomState === AppState.NoRound}
-					<div class="space-y-2 text-center">
-						<h2 class="text-base-content text-xl font-bold">🚫 Žiadne kolo</h2>
-						<p class="text-base-content/70 text-sm">Čakaj, kým Robo spustí hru</p>
-					</div>
-				{:else if roomState === AppState.DuelBetStart}
-					<DuelScreen
-						{userId}
-						setDuel={betDataHolder.setDuel}
-						roomId={+data.room.id}
-						bind:money
-						getEstimatedPayoutIndex={betDataHolder.getEstimatedPayoutIndex}
-						makeBetState={makeBetStateDuel}
-						setBetItem={betDataHolder.addMybet}
-					/>
-				{:else if derivedAppState === AppState.DuelBetEnded}
-					<div class="space-y-2 text-center">
-						{#if !betDataHolder.getIsBetted()}
-							<h2 class="text-warning text-xl font-bold">⚠️ Nezaregistrovaná stávka</h2>
-							<p class="text-base-content/70 text-sm">Počkaj na koniec kola</p>
-						{:else}
-							<h2 class="text-success text-xl font-bold">✅ Stávka zaregistrovaná</h2>
-							<p class="text-base-content/70 text-sm">
-								vsadil si {betDataHolder?.getBetItem().money} na
-								<span class="font-semibold">{betDataHolder?.getBetItem().name}</span>
-							</p>
-							<p class="text-base-content/70 text-sm">
-								Predpokladana vyhra je {Math.ceil(betDataHolder?.getMyEstimatedPayout())}
-							</p>
-							<p class="text-base-content/70 text-sm">
-								Predpokladany zisk je {Math.ceil(
-									betDataHolder?.getMyEstimatedPayout() - betDataHolder.getBetItem().money
-								)}
-							</p>
-							<p class="text-base-content/70 text-sm">Počkaj na koniec kola</p>
-						{/if}
-					</div>
-				{:else if roomState === AppState.RoundEnded}
-					<div class="space-y-4 text-center">
-						<h2 class="text-xl font-bold">🏁 Kolo skončilo</h2>
-
-						{#if moneyDiff < 0}
-							<p class="text-error font-semibold">❌ Prehral si {-moneyDiff}</p>
-						{:else}
-							<p class="text-success font-semibold">🎉 Vyhral si {moneyDiff}!</p>
-						{/if}
-
-						<p class="text-base-content/70 text-sm">
-							Aktuálny stav: <span class="font-bold">{money}</span>
-						</p>
-						<p class="text-base-content/70 text-sm">
-							Si na <span class="font-bold">{index}. </span> mieste
-						</p>
-
-						<div class="mt-4 text-left">
-							<h3 class="mb-2 text-lg font-semibold">🏆 Rebríček</h3>
-							<ol class="list-inside space-y-1">
-								{#each leaderBoard as user, index}
-									<li
-										class="rounded-box bg-base-300 border-base-200 flex items-center justify-between border-b px-3 py-2"
-									>
-										<div><span class="px-1">{index + 1}.</span>{user.name}</div>
-										<span class="font-semibold">{user.money}</span>
-									</li>
-								{/each}
-							</ol>
+<div class="bg-base-200 flex min-h-screen items-center justify-center px-4 py-12">
+	<div class="card bg-base-100 w-full max-w-md shadow-2xl">
+		<div class="card-body p-8">
+			{#key derivedAppState}
+				<div
+					out:fade={{
+						duration: 400
+					}}
+					in:fade={{
+						delay: 400
+					}}
+				>
+					{#if roomState === AppState.NoRound}
+						<div class="flex flex-col items-center justify-center space-y-6 py-8 text-center">
+							<div class="relative">
+								<span class="loading loading-ring loading-lg text-primary size-24"></span>
+							</div>
+							<div class="space-y-2">
+								<h2 class="text-base-content text-2xl font-bold">Žiadne aktívne kolo</h2>
+								<p class="text-base-content/70 text-sm">Počkaj, kým administrátor spustí hru</p>
+							</div>
 						</div>
-					</div>
-				{/if}
-			</div>
-		{/key}
+					{:else if roomState === AppState.DuelBetStart}
+						<DuelScreen
+							{userId}
+							setDuel={betDataHolder.setDuel}
+							roomId={+data.room.id}
+							bind:money
+							getEstimatedPayoutIndex={betDataHolder.getEstimatedPayoutIndex}
+							makeBetState={makeBetStateDuel}
+							setBetItem={betDataHolder.addMybet}
+						/>
+					{:else if derivedAppState === AppState.DuelBetEnded}
+						<div class="flex flex-col items-center space-y-6 text-center">
+							{#if !betDataHolder.getIsBetted()}
+								<div class="bg-warning/10 text-warning rounded-full p-4">
+									<span class="text-4xl font-bold">!</span>
+								</div>
+								<div class="space-y-2">
+									<h2 class="text-warning text-2xl font-bold">Stávka nebola odoslaná</h2>
+									<p class="text-base-content/70 text-sm">Počkaj na vyhodnotenie kola</p>
+								</div>
+							{:else}
+								<div class="bg-success/10 text-success rounded-full p-4 text-4xl">
+									✓
+								</div>
+								<div class="space-y-2">
+									<h2 class="text-success text-2xl font-bold">Stávka úspešne prijatá</h2>
+									<div class="badge badge-outline badge-lg mt-2 py-4 h-auto whitespace-normal">
+										Stavené {Math.round(betDataHolder?.getBetItem().money)} na
+										<span class="ml-1 font-bold">{betDataHolder?.getBetItem().name}</span>
+									</div>
+								</div>
+
+								<div class="stats bg-base-200 w-full shadow">
+									<div class="stat place-items-center">
+										<div class="stat-title text-xs opacity-70 uppercase">Možná výhra</div>
+										<div class="stat-value text-2xl">
+											{Math.round(betDataHolder?.getMyEstimatedPayout())}
+										</div>
+									</div>
+									<div class="stat place-items-center border-l border-base-300">
+										<div class="stat-title text-xs opacity-70 uppercase">Čistý zisk</div>
+										<div class="stat-value text-2xl text-success">
+											{Math.round(
+												betDataHolder?.getMyEstimatedPayout() - betDataHolder.getBetItem().money
+											)}
+										</div>
+									</div>
+								</div>
+
+								<div class="divider"></div>
+								<p class="text-base-content/60 flex items-center gap-2 text-sm italic">
+									<span class="loading loading-dots loading-xs"></span>
+									Prebieha vyhodnocovanie kola
+								</p>
+							{/if}
+						</div>
+					{:else if roomState === AppState.RoundEnded}
+						<div class="space-y-6 text-center">
+							<div class="flex flex-col items-center gap-2">
+								<h2 class="text-2xl font-bold">Kolo bolo ukončené</h2>
+							</div>
+
+							<div class="stats bg-base-200 w-full shadow">
+								<div class="stat place-items-center px-2">
+									<div class="stat-value text-xl sm:text-2xl {moneyDiff < 0 ? 'text-error' : 'text-success'}">
+										{#if moneyDiff < 0}
+											Strata: {Math.round(-moneyDiff)}
+										{:else}
+											Zisk: {Math.round(moneyDiff)}
+										{/if}
+									</div>
+								</div>
+							</div>
+
+							<div class="flex justify-around items-center py-4 border-y border-base-200 my-4">
+								<div class="text-center">
+									<p class="text-base-content/70 text-sm">
+										Tvoj zostatok: <span class="font-bold">{Math.round(money)} 🪙</span>
+									</p>
+								</div>
+								<div class="divider divider-horizontal mx-0"></div>
+								<div class="text-center">
+									<p class="text-base-content/70 text-sm">
+										Umiestnenie: <span class="font-bold">{index}. miesto</span>
+									</p>
+								</div>
+							</div>
+
+							<div class="mt-4 text-left">
+								<div class="divider font-bold uppercase tracking-widest opacity-50">Celkové poradie</div>
+								<div class="bg-base-200 max-h-64 overflow-y-auto rounded-xl shadow-inner">
+									<table class="table table-pin-rows">
+										<tbody>
+											{#each leaderBoard as leaderUser, idx}
+												<tr
+													class={leaderUser.id === userId
+														? 'bg-primary/20 font-bold'
+														: idx % 2 === 0
+															? 'bg-base-100/30'
+															: ''}
+												>
+													<th class="w-12 text-center opacity-50">{idx + 1}.</th>
+													<td>{leaderUser.name}</td>
+													<td class="text-right font-mono font-bold">{Math.round(leaderUser.money)}</td>
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+					{/if}
+				</div>
+			{/key}
+		</div>
 	</div>
 </div>
