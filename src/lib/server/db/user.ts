@@ -75,7 +75,26 @@ export const joinRoomByName = async (env: Env, roomName: string, userId: number)
 	if (updatedUsers.length > 0 && updatedUsers[0].roomId !== null) {
 		return updatedUsers[0];
 	} else {
-		return { message: "Room not found" };
+		return { error: "Room not found" };
+	}
+}
+
+export const resetRoomByAdminId = async (env: Env, adminId: number) => {
+	const dbEnv = db(env);
+
+	const admin = dbEnv.$with('admin').as(
+		dbEnv.select({ roomId: user.roomId, money: room.defaultMoney }).from(user).where(eq(user.id, adminId)).innerJoin(room, eq(user.roomId, room.id))
+	);
+
+	const updatedUsers = await dbEnv.with(admin).update(user).set({
+		roomId: sql`(select ${admin.roomId} from ${admin})`,
+		money: sql`(select ${admin.money} from ${admin})`,
+	}).where(eq(user.roomId, sql`(select ${admin.roomId} from ${admin})`)).returning({ id: user.id, roomId: user.roomId });
+
+	if (updatedUsers.length > 0 && updatedUsers[0].roomId !== null) {
+		return updatedUsers[0];
+	} else {
+		return { error: "Room not found" };
 	}
 }
 

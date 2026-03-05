@@ -9,8 +9,12 @@
 		appState
 	}: { user: User; moneyRequests: any[]; appState: AppState } = $props();
 
+	async function resetRoom() {
+		const resetResp = await fetch('admin/room/reset', { method: 'POST' });
+	}
 	let microtransactionDialog: MicrotransactionDialog | null = $state(null);
 	let adminRequestDialog: AdminRequestDialog | null = $state(null);
+	let resetDialog: HTMLDialogElement;
 </script>
 
 <div class="navbar bg-base-100 shadow-md">
@@ -55,7 +59,7 @@
 						</button>
 					</li>
 					<li>
-						<button onclick={() => alert('not implemented')}> Reset room </button>
+						<button onclick={() => resetDialog.show()}> Reset room </button>
 					</li>
 				{/if}
 			</ul>
@@ -68,4 +72,21 @@
 {/if}
 {#if user.isAdmin}
 	<AdminRequestDialog bind:this={adminRequestDialog} bind:requests={moneyRequests} />
+	<dialog bind:this={resetDialog} class="modal">
+		<div class="modal-box">
+			<h3 class="text-lg font-bold">Chces fakt resetnut roomku</h3>
+			<p>Vsetkym sa nastavia peniaze na default fakt to chces urobit</p>
+			<div class="modal-action">
+				<button class="btn" onclick={() => resetDialog.close()}>Nie</button>
+				<button
+					class="btn btn-error"
+					onclick={async () => {
+						await resetRoom();
+
+						resetDialog.close();
+					}}>Ano</button
+				>
+			</div>
+		</div>
+	</dialog>
 {/if}

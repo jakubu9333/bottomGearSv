@@ -25,6 +25,7 @@ const getRoomByUserIdQuery = (env: Env, userId: number) => {
 	return roomId
 }
 
+
 export const addDuelInRoom = async (env: Env, userId: number, duelId: number) => {
 	const roomQuery = getRoomByUserIdQuery(env, userId)
 	const roomFromDb = await db(env)

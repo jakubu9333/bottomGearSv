@@ -19,4 +19,8 @@ test.describe('Admin Dashboards and Controls', () => {
     test.skip('Admin can reset a room if something goes wrong', async ({ page }) => {
         // Implementation for room reset check
     });
+
+    test.skip('Edge case: reset room goes wrong', async ({ page }) => {
+        // Implementation for room reset check
+    });
 });
