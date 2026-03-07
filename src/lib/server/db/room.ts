@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm"
+import { desc, eq, gt, sql } from "drizzle-orm"
 import { db } from "."
 import { room, user } from "./schema"
 import { AppState } from "$lib/types"
@@ -17,6 +17,11 @@ export const createRoom = async (env: Env, name: string, defaultMoney: number) =
 }
 export const getRoomByUserId = async (env: Env, userId: number) => {
 	return (await db(env).select().from(user).leftJoin(room, eq(room.id, user.roomId)).where(eq(user.id, userId)))[0]
+}
+
+export const getRoomsCreatedToday = async (env: Env) => {
+	const limit = new Date(Date.now() - 4 * 60 /*hour*/ * 60 * 60 * 1000)
+	return (await db(env).select().from(room).where(gt(room.createdAt, limit)).orderBy(desc(room.createdAt)))
 }
 
 const getRoomByUserIdQuery = (env: Env, userId: number) => {

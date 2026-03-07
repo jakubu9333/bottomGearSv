@@ -5,12 +5,15 @@
 	import { onMount } from 'svelte';
 	import type { MoneyUpdateEvent } from '$lib/types';
 	import { fade, fly } from 'svelte/transition';
+	import RoomList from '$lib/components/RoomList.svelte';
 
 	let { data, form }: PageProps = $props();
 	let user = $state(data.user);
 	let wantToChangeRoom = $state(false);
 	const isAdmin = user?.isAdmin ?? false;
 	let microtransactionDialog: MicrotransactionDialog;
+	let roomInput: HTMLInputElement | undefined = $state(undefined);
+	let loginForm: HTMLFormElement | undefined = $state(undefined);
 
 	onMount(() => {
 		if (user.roomId) {
@@ -109,7 +112,13 @@
 
 					{#if !user.roomId || wantToChangeRoom}
 						<div class="divider">OR</div>
-						<form method="POST" action="?/joinRoom" use:enhance class="flex flex-col gap-4">
+						<form
+							bind:this={loginForm}
+							method="POST"
+							action="?/joinRoom"
+							use:enhance
+							class="flex flex-col gap-4"
+						>
 							{#if form?.error}
 								<div role="alert" class="alert alert-error">
 									<svg
@@ -129,9 +138,17 @@
 							{/if}
 							<label class="input input-bordered flex items-center gap-2">
 								Room
-								<input type="text" class="grow" placeholder="Name" name="roomName" required />
+								<input
+									bind:this={roomInput}
+									type="text"
+									class="grow"
+									placeholder="Name"
+									name="roomName"
+									required
+								/>
 							</label>
 							<button class="btn btn-secondary w-full">Join Room</button>
+							<RoomList {loginForm} {roomInput} isButtonDisabled={false}></RoomList>
 						</form>
 					{/if}
 				</div>

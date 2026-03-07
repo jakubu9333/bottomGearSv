@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm';
 import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
 const DEFAULT_MONEY = 250
 export const user = sqliteTable('user', {
@@ -5,7 +6,7 @@ export const user = sqliteTable('user', {
 	name: text().notNull(),
 	googleId: text("google_id"),
 	roomId: integer("room_id").references(() => room.id),
-	isAdmin: integer("is_admin").notNull().default(0), // 0 - false , 1 - true
+	isAdmin: integer("is_admin", { mode: "boolean" }).notNull().default(false), // 0 - false , 1 - true
 	money: real().notNull().default(DEFAULT_MONEY)
 });
 
@@ -15,7 +16,8 @@ export const room = sqliteTable('room', {
 	state: integer().notNull().default(0),
 	round: integer().notNull().default(0),
 	duelNow: integer("duel_now"),
-	defaultMoney: integer().notNull().default(DEFAULT_MONEY)
+	defaultMoney: integer().notNull().default(DEFAULT_MONEY),
+	createdAt: integer({ mode: "timestamp" }).notNull().default(sql`(unixepoch())`)
 });
 
 export const duel = sqliteTable('duel', {

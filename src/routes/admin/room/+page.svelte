@@ -33,6 +33,7 @@
 					class="input input-bordered w-full"
 					required
 					name="defaultMoney"
+					value="250"
 				/>
 			</label>
 

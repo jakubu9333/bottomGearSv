@@ -7,7 +7,8 @@ import type { RequestEvent } from './routes/$types';
 const freeUrls = [
     "/login",
     "/login/google",
-    "/login/google/callback"
+    "/login/google/callback",
+    "/room/recent"
 ]
 
 
