@@ -1,6 +1,6 @@
 
 export const getSocketAdress = () => {
-	const isDev = true
+	const isDev = false
 	if (isDev) {
 		return 'ws://localhost:8787';
 	} else {
