@@ -39,8 +39,8 @@ export const setUserAdmin = async (env: Env, userId: number) => {
 	return (await db(env).update(user).set({ isAdmin: 1 }).where(eq(user.id, userId)).returning())[0]
 }
 
-export const setUserRoomId = async (env: Env, userId: number, roomId: number) => {
-	return (await db(env).update(user).set({ roomId }).where(eq(user.id, userId)).returning())[0]
+export const joinAdminIntoRoom = async (env: Env, userId: number, roomId: number, defaultMoney: number) => {
+	return (await db(env).update(user).set({ roomId, money: defaultMoney }).where(eq(user.id, userId)).returning())[0]
 }
 
 export const removeUserMoney = async (env: Env, userId: number, money: number) => {

@@ -1,5 +1,5 @@
 import { createRoom } from "$lib/server/db/room";
-import { setUserRoomId } from "$lib/server/db/user";
+import { joinAdminIntoRoom } from "$lib/server/db/user";
 import { fail, redirect, type Actions } from "@sveltejs/kit";
 
 export const actions = {
@@ -17,7 +17,7 @@ export const actions = {
 			return fail(400, { defaultMoney, missing: true });
 		}
 		const createdRoom = await createRoom(platform.env, room, +defaultMoney)
-		await setUserRoomId(platform.env, locals.userId, createdRoom.id)
+		await joinAdminIntoRoom(platform.env, locals.userId, createdRoom.id, +defaultMoney)
 		if (createdRoom) {
 			return redirect(303, `/admin/room/${createdRoom.id}`)
 		}
