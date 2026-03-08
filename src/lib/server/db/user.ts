@@ -69,7 +69,7 @@ export const joinRoomByName = async (env: Env, roomName: string, userId: number)
 
 	const updatedUsers = await dbEnv.with(roomCte).update(user).set({
 		roomId: sql`(select id from ${roomCte})`,
-		money: sql`(select money from ${roomCte})`,
+		money: sql`(select ${roomCte.money} from ${roomCte})`,
 	}).where(eq(user.id, userId)).returning({ id: user.id, roomId: user.roomId });
 
 	if (updatedUsers.length > 0 && updatedUsers[0].roomId !== null) {

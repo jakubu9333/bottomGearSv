@@ -20,7 +20,7 @@ export const getRoomByUserId = async (env: Env, userId: number) => {
 }
 
 export const getRoomsCreatedToday = async (env: Env) => {
-	const limit = new Date(Date.now() - 4 * 60 /*hour*/ * 60 * 60 * 1000)
+	const limit = new Date(Date.now() - 4/*hour*/ * 60 * 60 * 1000)
 	return (await db(env).select().from(room).where(gt(room.createdAt, limit)).orderBy(desc(room.createdAt)))
 }
 
