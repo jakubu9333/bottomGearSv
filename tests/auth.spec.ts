@@ -33,8 +33,19 @@ test.describe('Authentication and User Profile logged user', () => {
         await expect(page).toHaveURL('/room');
     });
 
-    test.skip('User can change their display name', async ({ page }) => {
-        // Implementation for changing name via /name route
+    test('User can change their display name', async ({ page }) => {
+        await page.goto("/")
+        await page.waitForURL('/');
+        await page.getByTestId("headerAvatar").click()
+        await page.getByTestId("headerChangeName").click()
+        await page.waitForURL("/name")
+        const newName = "janko spaniel"
+
+        await page.getByPlaceholder("Nove meno").fill(newName)
+        await page.getByRole("button", { name: "Zmenit" }).click()
+
+        await page.waitForURL("/")
+        await expect(page.getByText(newName)).toBeVisible()
     });
 
 });
