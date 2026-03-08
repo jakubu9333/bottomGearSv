@@ -6,15 +6,23 @@
 	let {
 		user = $bindable(),
 		moneyRequests = $bindable(),
-		appState
-	}: { user: User; moneyRequests: any[]; appState: AppState } = $props();
+		appState = AppState.NoRound,
+		areMoneyRequestsVisible = false
+	}: {
+		user: User;
+		moneyRequests: any[];
+		appState: AppState;
+		areMoneyRequestsVisible: boolean;
+	} = $props();
 
 	async function resetRoom() {
 		const resetResp = await fetch('admin/room/reset', { method: 'POST' });
+		if (resetResp.ok) {
+		}
 	}
 	let microtransactionDialog: MicrotransactionDialog | null = $state(null);
 	let adminRequestDialog: AdminRequestDialog | null = $state(null);
-	let resetDialog: HTMLDialogElement;
+	let resetDialog: HTMLDialogElement | null = $state(null);
 </script>
 
 <div class="navbar bg-base-100 shadow-md">
@@ -39,43 +47,51 @@
 				</div>
 			</div>
 			<ul
-				tabindex="0"
+				tabindex="1"
 				class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
 			>
 				<li><a href="/name">Change Name</a></li>
-				<li>
-					<button onclick={() => microtransactionDialog?.show()}>Request Coins</button>
-				</li>
 				{#if user.isAdmin}
-					<li>
-						<button
-							onclick={() => adminRequestDialog?.show()}
-							disabled={moneyRequests.length == 0 || !moneyRequests}
-						>
-							Pending requests
-							{#if moneyRequests && moneyRequests.length > 0}
-								<span class="badge badge-secondary badge-sm">{moneyRequests.length}</span>
-							{/if}
-						</button>
-					</li>
 					<li>
 						<button onclick={() => resetDialog.show()}> Reset room </button>
 					</li>
+				{/if}
+				{#if areMoneyRequestsVisible}
+					<li>
+						<button onclick={() => microtransactionDialog?.show()}>Request Coins</button>
+					</li>
+					{#if user.isAdmin}
+						<li>
+							<button
+								onclick={() => adminRequestDialog?.show()}
+								disabled={moneyRequests.length == 0 || !moneyRequests}
+							>
+								Pending requests
+								{#if moneyRequests && moneyRequests.length > 0}
+									<span class="badge badge-secondary badge-sm">{moneyRequests.length}</span>
+								{/if}
+							</button>
+						</li>
+					{/if}
 				{/if}
 			</ul>
 		</div>
 	</div>
 </div>
-
-{#if appState === AppState.NoRound || appState === AppState.RoundEnded}
-	<MicrotransactionDialog bind:this={microtransactionDialog} />
+{#if areMoneyRequestsVisible}
+	{#if appState === AppState.NoRound || appState === AppState.RoundEnded}
+		<MicrotransactionDialog bind:this={microtransactionDialog} />
+	{/if}
+	{#if user.isAdmin}
+		<AdminRequestDialog bind:this={adminRequestDialog} bind:requests={moneyRequests} />
+	{/if}
 {/if}
 {#if user.isAdmin}
-	<AdminRequestDialog bind:this={adminRequestDialog} bind:requests={moneyRequests} />
 	<dialog bind:this={resetDialog} class="modal">
 		<div class="modal-box">
 			<h3 class="text-lg font-bold">Chces fakt resetnut roomku</h3>
-			<p>Vsetkym sa nastavia peniaze na default fakt to chces urobit</p>
+			<p>Vsetkym sa nastavia peniaze na default</p>
+			<p>Fakt to chces urobit?</p>
 			<div class="modal-action">
 				<button class="btn" onclick={() => resetDialog.close()}>Nie</button>
 				<button

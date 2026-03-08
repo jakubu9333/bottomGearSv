@@ -1,17 +1,16 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import type { PageProps } from './$types';
-	import MicrotransactionDialog from '$lib/components/MicrotransactionDialog.svelte';
 	import { onMount } from 'svelte';
 	import type { MoneyUpdateEvent } from '$lib/types';
 	import { fade, fly } from 'svelte/transition';
 	import RoomList from '$lib/components/RoomList.svelte';
+	import Header from '$lib/components/Header.svelte';
 
 	let { data, form }: PageProps = $props();
 	let user = $state(data.user);
 	let wantToChangeRoom = $state(false);
 	const isAdmin = user?.isAdmin ?? false;
-	let microtransactionDialog: MicrotransactionDialog;
 	let roomInput: HTMLInputElement | undefined = $state(undefined);
 	let loginForm: HTMLFormElement | undefined = $state(undefined);
 
@@ -33,6 +32,7 @@
 			});
 		}
 	});
+	let moneyRequests = $state([]);
 </script>
 
 <svelte:head>
@@ -40,30 +40,7 @@
 </svelte:head>
 
 <div class="bg-base-200 min-h-screen font-sans">
-	<!-- Navbar -->
-	<div class="navbar bg-base-100 shadow-md">
-		<div class="h-24 w-24 flex-1 rounded">
-			<a href="/" class="btn btn-ghost h-24 w-24 gap-2 text-xl">
-				<img src="/BG_Transparent.png" height="96" width="96" />
-			</a>
-		</div>
-		<div class="flex-none gap-2">
-			<div class="dropdown dropdown-end">
-				<div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar placeholder">
-					<div class="bg-neutral text-neutral-content w-10 rounded-full">
-						<span class="text-xl">{user.name.charAt(0).toUpperCase()}</span>
-					</div>
-				</div>
-				<ul
-					tabindex="0"
-					class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
-				>
-					<li><a href="/name">Change Name</a></li>
-					<li><button onclick={() => microtransactionDialog.show()}>Request Coins</button></li>
-				</ul>
-			</div>
-		</div>
-	</div>
+	<Header bind:user bind:moneyRequests></Header>
 
 	<main class="container mx-auto p-4 md:p-8">
 		<!-- Welcome Hero -->
@@ -76,11 +53,6 @@
 						<div class="stat">
 							<div class="stat-title">Current Balance</div>
 							<div class="stat-value text-primary">{Math.floor(user.money)} 🪙</div>
-							<div class="stat-actions">
-								<button class="btn btn-success btn-sm" onclick={() => microtransactionDialog.show()}
-									>Add Funds</button
-								>
-							</div>
 						</div>
 					</div>
 				</div>
@@ -180,5 +152,3 @@
 		</div>
 	</main>
 </div>
-
-<MicrotransactionDialog bind:this={microtransactionDialog} />

@@ -142,7 +142,7 @@
 	<title>Bottom Gear | Room</title>
 </svelte:head>
 
-<Header bind:user bind:moneyRequests appState={roomState} />
+<Header bind:user bind:moneyRequests appState={roomState} areMoneyRequestsVisible={true} />
 <div class="bg-base-200 flex min-h-screen items-center justify-center px-4 py-12">
 	<div class="card bg-base-100 w-full max-w-md shadow-2xl">
 		<div class="card-body p-8">
@@ -186,12 +186,10 @@
 									<p class="text-base-content/70 text-sm">Počkaj na vyhodnotenie kola</p>
 								</div>
 							{:else}
-								<div class="bg-success/10 text-success rounded-full p-4 text-4xl">
-									✓
-								</div>
+								<div class="bg-success/10 text-success rounded-full p-4 text-4xl">✓</div>
 								<div class="space-y-2">
 									<h2 class="text-success text-2xl font-bold">Stávka úspešne prijatá</h2>
-									<div class="badge badge-outline badge-lg mt-2 py-4 h-auto whitespace-normal">
+									<div class="badge badge-outline badge-lg mt-2 h-auto py-4 whitespace-normal">
 										Stavené {Math.round(betDataHolder?.getBetItem().money)} na
 										<span class="ml-1 font-bold">{betDataHolder?.getBetItem().name}</span>
 									</div>
@@ -199,14 +197,14 @@
 
 								<div class="stats bg-base-200 w-full shadow">
 									<div class="stat place-items-center">
-										<div class="stat-title text-xs opacity-70 uppercase">Možná výhra</div>
+										<div class="stat-title text-xs uppercase opacity-70">Možná výhra</div>
 										<div class="stat-value text-2xl">
 											{Math.round(betDataHolder?.getMyEstimatedPayout())}
 										</div>
 									</div>
-									<div class="stat place-items-center border-l border-base-300">
-										<div class="stat-title text-xs opacity-70 uppercase">Čistý zisk</div>
-										<div class="stat-value text-2xl text-success">
+									<div class="stat border-base-300 place-items-center border-l">
+										<div class="stat-title text-xs uppercase opacity-70">Čistý zisk</div>
+										<div class="stat-value text-success text-2xl">
 											{Math.round(
 												betDataHolder?.getMyEstimatedPayout() - betDataHolder.getBetItem().money
 											)}
@@ -229,7 +227,11 @@
 
 							<div class="stats bg-base-200 w-full shadow">
 								<div class="stat place-items-center px-2">
-									<div class="stat-value text-xl sm:text-2xl {moneyDiff < 0 ? 'text-error' : 'text-success'}">
+									<div
+										class="stat-value text-xl sm:text-2xl {moneyDiff < 0
+											? 'text-error'
+											: 'text-success'}"
+									>
 										{#if moneyDiff < 0}
 											Strata: {Math.round(-moneyDiff)}
 										{:else}
@@ -239,7 +241,7 @@
 								</div>
 							</div>
 
-							<div class="flex justify-around items-center py-4 border-y border-base-200 my-4">
+							<div class="border-base-200 my-4 flex items-center justify-around border-y py-4">
 								<div class="text-center">
 									<p class="text-base-content/70 text-sm">
 										Tvoj zostatok: <span class="font-bold">{Math.round(money)} 🪙</span>
@@ -254,9 +256,11 @@
 							</div>
 
 							<div class="mt-4 text-left">
-								<div class="divider font-bold uppercase tracking-widest opacity-50">Celkové poradie</div>
+								<div class="divider font-bold tracking-widest uppercase opacity-50">
+									Celkové poradie
+								</div>
 								<div class="bg-base-200 max-h-64 overflow-y-auto rounded-xl shadow-inner">
-									<table class="table table-pin-rows">
+									<table class="table-pin-rows table">
 										<tbody>
 											{#each leaderBoard as leaderUser, idx}
 												<tr
@@ -268,7 +272,9 @@
 												>
 													<th class="w-12 text-center opacity-50">{idx + 1}.</th>
 													<td>{leaderUser.name}</td>
-													<td class="text-right font-mono font-bold">{Math.round(leaderUser.money)}</td>
+													<td class="text-right font-mono font-bold"
+														>{Math.round(leaderUser.money)}</td
+													>
 												</tr>
 											{/each}
 										</tbody>
