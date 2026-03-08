@@ -1,3 +1,4 @@
+import { dev } from '$app/environment';
 import { createUser } from '$lib/server/db/user';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions } from './$types';
@@ -26,6 +27,13 @@ export const actions = {
             return fail(400, { error: "room not found" });
         }
         user = await createUser(env, username, roomFromDb.id, roomFromDb.defaultMoney)
+        
+        // In dev mode, names starting with admin_ become admins automatically for testing
+        if (dev && username.startsWith("admin_")) {
+            const { setUserAdmin } = await import('$lib/server/db/user');
+            await setUserAdmin(env, user.id);
+            user.isAdmin = true;
+        }
 
         const message = {
             type: 'join',

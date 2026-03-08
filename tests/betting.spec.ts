@@ -41,6 +41,13 @@ test.describe('Betting Functionality and Edge Cases', () => {
         // Implementation for balance update verification
     });
 
+    test.skip('Real-time: real time bet test happy path', async ({ page }) => {
+        // Implementation for balance update verification
+    });
+    test.skip('Real-time: real time bet test happy refresh, change name', async ({ page }) => {
+        // Implementation for balance update verification
+    });
+
     test.skip('User can skip betting on a round and their balance remains unchanged', async ({ page }) => {
         // Implementation for skipping a bet
     });

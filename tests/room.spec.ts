@@ -7,7 +7,6 @@ test.describe('Room Management and Real-time Updates', () => {
 
     test.skip('Joining an existing room by a user', async ({ page }) => {
         // Basic happy path for joining a room
-        // google chrome
     });
 
     test.skip('Edge Case: Joining a non-existent room should result in an error message or redirect', async ({ page }) => {
@@ -18,7 +17,7 @@ test.describe('Room Management and Real-time Updates', () => {
         // Basic happy path for changing a user's name
     });
 
-    test.skip('Real-time: User joining a room is immediately visible to others', async ({ page }) => {
+    test.skip('Real-time: User joining a room is immediately visible to admin', async ({ page }) => {
         // Real-time synchronization check for user presence
     });
 
