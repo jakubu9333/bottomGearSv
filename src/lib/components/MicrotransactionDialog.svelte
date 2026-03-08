@@ -5,9 +5,13 @@
 	const pricePerCoin = 10 / 250;
 
 	async function requestMoney() {
+		let finalAmount = amount;
+		if (finalAmount > MAX_MONEY) finalAmount = MAX_MONEY;
+		if (finalAmount < MIN_MONEY) finalAmount = MIN_MONEY;
+
 		await fetch('/moneyreq/create', {
 			method: 'POST',
-			body: JSON.stringify({ amount, price: amount * pricePerCoin })
+			body: JSON.stringify({ amount: finalAmount, price: finalAmount * pricePerCoin })
 		});
 		dialog.close();
 	}
@@ -16,9 +20,13 @@
 		dialog.showModal();
 	}
 	const MAX_MONEY = 1000;
+	const MIN_MONEY = 50;
 	$effect(() => {
 		if (amount > MAX_MONEY) {
 			amount = MAX_MONEY;
+		}
+		if (amount < MIN_MONEY) {
+			amount = MIN_MONEY;
 		}
 	});
 </script>

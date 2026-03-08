@@ -128,6 +128,7 @@
 	}
 
 	async function makeBetStateDuel() {
+		user.money = money;
 		nextState(EventType.DuelBetPlaced);
 	}
 

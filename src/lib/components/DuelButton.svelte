@@ -21,6 +21,7 @@
 <button
 	class={`btn ${participant.buttonClass} items-align h-20 w-full flex-col`}
 	onclick={() => duelBet(participant.winnerIndex)}
+	data-testid={`duelBtn_${participant.winnerIndex}`}
 >
 	<div class="text-center text-lg font-bold">{participant.name}</div>
 	<div class="text-sm font-normal">

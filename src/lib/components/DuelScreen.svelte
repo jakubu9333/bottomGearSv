@@ -95,16 +95,18 @@
 
 <div class="flex flex-col gap-6">
 	<div class="text-center">
-		<h2 class="text-base-content text-2xl font-bold uppercase tracking-tight">Nová stávka na duel</h2>
+		<h2 class="text-base-content text-2xl font-bold tracking-tight uppercase">
+			Nová stávka na duel
+		</h2>
 	</div>
 
 	{#if errorLook}
-		<div class="alert alert-error shadow-sm py-2">
+		<div class="alert alert-error py-2 shadow-sm">
 			<span>Chyba pri spracovaní. Skús to znova.</span>
 		</div>
 	{/if}
 	{#if moneyWarning}
-		<div class="alert alert-warning shadow-sm py-2">
+		<div class="alert alert-warning py-2 shadow-sm" data-testid="zeroWarning">
 			<span>Suma stávky musí byť vyššia ako nula.</span>
 		</div>
 	{/if}

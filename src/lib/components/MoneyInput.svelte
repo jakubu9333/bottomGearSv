@@ -8,6 +8,9 @@
 		if (moneyToBet > money) {
 			moneyToBet = money;
 		}
+		if (moneyToBet < 0) {
+			moneyToBet = 0;
+		}
 	});
 </script>
 
@@ -22,6 +25,7 @@
 		max={money}
 		min="0"
 		class="input input-bordered input-primary w-full"
+		data-testid="moneyInput"
 	/>
 	<input
 		type="range"

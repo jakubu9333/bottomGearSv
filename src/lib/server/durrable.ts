@@ -8,15 +8,15 @@ export function getDurrableObject(env: Env, roomId: number) {
 	return roomDurableObject
 }
 
+async function mockDurableForDev(roomId: number, message: SocketMessage) {
+	await fetch(`http://localhost:8787/${message.type}`, { method: "POST", body: JSON.stringify({ ...message, roomId }) })
+}
+
 export async function sendSocketMessage(env: Env, roomId: number, message: SocketMessage) {
 	if (dev) {
-		await mockDurableForDev(message);
+		await mockDurableForDev(roomId, message);
 	} else {
 		const durableObject = getDurrableObject(env, roomId);
 		await durableObject.broadcast(message);
 	}
-}
-
-async function mockDurableForDev(message: SocketMessage) {
-	await fetch(`http://localhost:8787/${message.type}`, { method: "POST", body: JSON.stringify(message) })
 }

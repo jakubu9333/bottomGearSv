@@ -57,7 +57,7 @@
 						<button onclick={() => resetDialog.show()}> Reset room </button>
 					</li>
 				{/if}
-				{#if areMoneyRequestsVisible}
+				{#if areMoneyRequestsVisible && (appState === AppState.NoRound || appState === AppState.RoundEnded)}
 					<li>
 						<button onclick={() => microtransactionDialog?.show()}>Request Coins</button>
 					</li>
