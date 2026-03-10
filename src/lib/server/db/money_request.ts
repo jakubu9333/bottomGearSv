@@ -7,7 +7,11 @@ export const createMoneyRequest = async (env: Env, userId: number, amount: numbe
 };
 
 export const getMoneyRequestById = async (env: Env, id: number) => {
-    return (await db(env).select().from(moneyRequest).where(eq(moneyRequest.id, id)))[0];
+    return (await db(env).select().from(moneyRequest).where(and(eq(moneyRequest.id, id), eq(moneyRequest.status, "pending"))))[0];
+};
+
+export const getMoneyRequestByUserId = async (env: Env, userId: number) => {
+    return (await db(env).select().from(moneyRequest).where(and(eq(moneyRequest.userId, userId), eq(moneyRequest.status, "pending"))))[0];
 };
 
 export const getPendingMoneyRequests = async (env: Env) => {

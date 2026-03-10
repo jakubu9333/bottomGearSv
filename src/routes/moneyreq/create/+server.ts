@@ -1,6 +1,6 @@
-import { json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { createMoneyRequest } from '$lib/server/db/money_request';
+import { createMoneyRequest, getMoneyRequestByUserId } from '$lib/server/db/money_request';
 import { getUser } from '$lib/server/db/user';
 import { sendSocketMessage } from '$lib/server/durrable';
 
@@ -17,6 +17,10 @@ export const POST: RequestHandler = async ({ request, platform, locals }) => {
 
     if (!user) {
         return json({ error: 'User not found' }, { status: 404 });
+    }
+    const pendingRequest = await getMoneyRequestByUserId(env, user.id)
+    if (pendingRequest) {
+        return error(400, { message: 'You have pending request' });
     }
 
     const moneyRequest = await createMoneyRequest(env, user.id, amount, price);

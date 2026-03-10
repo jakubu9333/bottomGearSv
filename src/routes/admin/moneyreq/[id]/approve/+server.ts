@@ -1,4 +1,4 @@
-import { json } from '@sveltejs/kit';
+import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { approveMoneyRequest, getMoneyRequestById } from '$lib/server/db/money_request';
 import { addUserMoney, getUser } from '$lib/server/db/user';
@@ -15,7 +15,7 @@ export const POST: RequestHandler = async ({ platform, params }) => {
     const moneyRequest = await getMoneyRequestById(env, id);
 
     if (!moneyRequest) {
-        return json({ error: 'Money request not found' }, { status: 404 });
+        return error(404, { message: 'Money request not found or is already resolved' });
     }
 
     const updatedUser = await addUserMoney(env, moneyRequest.userId, moneyRequest.amount);
