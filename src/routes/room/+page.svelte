@@ -20,7 +20,16 @@
 	const savedRound = createPersistentStore('round', data.room.round);
 	const moneyBeforeBet = createPersistentStore<number>('beforeWinMoney', data.user.money);
 	let webSocket: WebSocket | undefined = $state(undefined);
-	let index = $state(0);
+	let leaderBoard: { name: string; money: number; id: number }[] = $state([]);
+	let meInLeaderBoard = $derived.by(() => {
+		return leaderBoard.find((item) => item.id === data.user.id);
+	});
+	let place = $derived.by(() => {
+		if (!meInLeaderBoard) {
+			return 0;
+		}
+		return leaderBoard.indexOf(meInLeaderBoard) + 1;
+	});
 	onMount(() => {
 		if (roomState !== AppState.NoRound) {
 			updateAppToState(roomState, data.room.round);
@@ -57,6 +66,10 @@
 							if (res.ok) {
 								user = await res.json();
 								money = user.money;
+								if (meInLeaderBoard) {
+									meInLeaderBoard.money = user.money
+									leaderBoard = leaderBoard.sort((a,b) => b.money-a.money);
+								}
 							}
 						});
 					}
@@ -111,20 +124,14 @@
 		return body;
 	}
 
-	let leaderBoard: { name: string; money: number; id: number }[] = $state([]);
-
 	async function getWin() {
 		const newLeaderBoard = await getLeaderBoard();
 		if (newLeaderBoard === null) {
 			return;
 		}
 		leaderBoard = newLeaderBoard;
-		const me = newLeaderBoard.find((item) => item.id === data.user.id);
+		const me = leaderBoard.find((item) => item.id === data.user.id);
 		money = me?.money ?? 0;
-		if (!me) {
-			return;
-		}
-		index = newLeaderBoard.indexOf(me) + 1;
 	}
 
 	async function makeBetStateDuel() {
@@ -251,7 +258,7 @@
 								<div class="divider divider-horizontal mx-0"></div>
 								<div class="text-center">
 									<p class="text-base-content/70 text-sm">
-										Umiestnenie: <span class="font-bold">{index}. miesto</span>
+										Umiestnenie: <span class="font-bold">{place}. miesto</span>
 									</p>
 								</div>
 							</div>

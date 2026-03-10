@@ -44,9 +44,7 @@
 					class="btn-primary btn"
 					onclick={() => {
 						roomInput.value = room.name;
-						if (loginForm.checkValidity()) {
-							loginForm.submit();
-						}
+						loginForm.checkValidity();
 					}}>JOIN</button
 				>
 			</li>

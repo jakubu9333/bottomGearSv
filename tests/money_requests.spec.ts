@@ -247,12 +247,105 @@ test.describe.serial('Money Requests (Microtransactions)', () => {
         await admin_context.close()
     });
 
-    test.skip('Edge Case: Approving or rejecting an already processed request should fail', async ({ page }) => {
+    test('Edge Case: Approving or rejecting an already processed request should fail', async ({ browser }) => {
+        const { roomName, admin_context } = await setupRoom(browser)
+        const { page, context, bot_name } = await joinRoom(browser, roomName)
+
+        // Bot creates a request
+        await openRequestDialog(page);
+        await page.locator("#amount").fill("100")
+        await page.getByRole("button", { name: "Confirm Request" }).click()
+        await expect(page.getByRole("heading", { name: "Request coins" })).not.toBeVisible()
+
+        // Open two admin pages
+        const admin_page1 = await admin_context.newPage()
+        const admin_page2 = await admin_context.newPage()
+
+        await admin_page1.goto(`/room`)
+        await admin_page2.goto(`/room`)
+
+        await openAdminPendingDialog(admin_page1);
+        await openAdminPendingDialog(admin_page2);
+
+        const item1 = admin_page1.locator("li").filter({ hasText: new RegExp("^" + bot_name + " requested") });
+        const item2 = admin_page2.locator("li").filter({ hasText: new RegExp("^" + bot_name + " requested") });
+
+        await expect(item1).toBeVisible({ timeout: 15000 });
+        await expect(item2).toBeVisible({ timeout: 15000 });
+        
+        // Admin 1 approves
+        await item1.getByRole("button", { name: "✅" }).click()
+        await expect(item1).not.toBeVisible({ timeout: 10000 });
+
+        // Admin 2 tries to approve the same (now stale) request
+        // We expect a 404 response from the server and an error message in the UI
+        const responsePromise = admin_page2.waitForResponse(resp => 
+            resp.url().includes("/approve") && resp.status() === 404
+        );
+        
+        await item2.getByRole("button", { name: "✅" }).click()
+        
+        const response = await responsePromise;
+        expect(response.status()).toBe(404);
+        
+        // Verify that the error message is visible in the UI
+        await expect(admin_page2.getByRole("alert")).toBeVisible();
+        await expect(admin_page2.getByText("Money request not found or is already resolved")).toBeVisible();
+        
+        // The item should still be filtered out in the click handler
+        await expect(item2).not.toBeVisible({ timeout: 10000 });
+
+        await admin_page1.close()
+        await admin_page2.close()
+        await context.close()
+        await admin_context.close()
     });
 
-    test.skip('Edge Case: creation during the state change', async ({ page }) => {
+    test('Edge Case: creation during the state change', async ({ browser }) => {
+        const { roomName, admin_token, admin_context } = await setupRoom(browser)
+        const { page, context } = await joinRoom(browser, roomName)
+
+        // Open request dialog while room is in NoRound state
+        await openRequestDialog(page);
+        await expect(page.getByRole("heading", { name: "Request coins" })).toBeVisible();
+
+        // Start a duel from the background to change room state
+        await page.request.post(`/api/duel`, {
+            data: { firstName: "A", secondName: "B" },
+            headers: { Authorization: `Bearer ${admin_token}` }
+        })
+
+        // Wait for state update to reflect in UI - DuelScreen shows "Nová stávka na duel"
+        await expect(page.getByText("Nová stávka na duel")).toBeVisible({ timeout: 15000 })
+
+        // The dialog should be removed from the DOM because of {#if appState === ...} in Header.svelte
+        await page.waitForTimeout(1000);
+        const dialog = page.locator("dialog h3:has-text('Request coins')")
+        await expect(dialog).not.toBeAttached({ timeout: 10000 })
+
+        await context.close()
+        await admin_context.close()
     });
 
-    test.skip('User: cannot create money request when request is in progress', async ({ page }) => {
+    test('User: cannot create money request when request is in progress', async ({ browser }) => {
+        const { roomName, admin_context } = await setupRoom(browser)
+        const { page, context } = await joinRoom(browser, roomName)
+
+        await openRequestDialog(page);
+        await page.locator("#amount").fill("100")
+        await page.getByRole("button", { name: "Confirm Request" }).click()
+        await expect(page.getByRole("heading", { name: "Request coins" })).not.toBeVisible()
+
+        // Try to create another one immediately
+        await openRequestDialog(page);
+        await page.locator("#amount").fill("200")
+        await page.getByRole("button", { name: "Confirm Request" }).click()
+
+        // Should show error message from server
+        await expect(page.getByText("You have pending request")).toBeVisible()
+        await page.getByRole("button", { name: "Ok" }).click()
+
+        await context.close()
+        await admin_context.close()
     });
 });
