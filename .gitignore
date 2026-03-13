@@ -26,3 +26,7 @@ vite.config.ts.timestamp-*
 *.db
 
 .dev.vars*
+
+
+#socketAdress
+src/lib/socketClient.ts
