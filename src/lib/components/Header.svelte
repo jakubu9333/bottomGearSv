@@ -2,7 +2,8 @@
 	import MicrotransactionDialog from '$lib/components/MicrotransactionDialog.svelte';
 	import AdminRequestDialog from '$lib/components/AdminRequestDialog.svelte';
 	import { AppState, type User } from '$lib/types';
-
+	import Avatar from './Avatar.svelte';
+	import { goto } from '$app/navigation';
 	let {
 		user = $bindable(),
 		moneyRequests = $bindable(),
@@ -20,6 +21,12 @@
 		if (resetResp.ok) {
 		}
 	}
+	async function logout() {
+		const reset = await fetch('admin/logout', { method: 'POST' });
+		if (reset.ok) {
+			goto('/login');
+		}
+	}
 	let microtransactionDialog: MicrotransactionDialog | null = $state(null);
 	let adminRequestDialog: AdminRequestDialog | null = $state(null);
 	let resetDialog: HTMLDialogElement | null = $state(null);
@@ -27,7 +34,17 @@
 
 <div class="navbar bg-base-100 shadow-md">
 	<div class="h-24 w-24 flex-1 rounded">
-		<a href="/" class="btn btn-ghost h-24 w-24 gap-2 text-xl">
+		<a href="/" class="btn btn-ghost h-24 gap-2 text-xl">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				height="96px"
+				viewBox="0 -960 960 960"
+				width="48px"
+				fill="var(--color-base-content)"
+				><path
+					d="M220-180h150v-250h220v250h150v-390L480-765 220-570v390Zm-60 60v-480l320-240 320 240v480H530v-250H430v250H160Zm320-353Z"
+				/></svg
+			>
 			<img src="/BG_Transparent.png" height="96" width="96" />
 		</a>
 	</div>
@@ -36,25 +53,22 @@
 			{Math.round(user.money)} 🪙
 		</div>
 		<div class="dropdown dropdown-end">
-			<div
-				tabindex="0"
-				data-testid="headerAvatar"
-				role="button"
-				class={'btn btn-ghost btn-circle avatar placeholder' +
-					`${moneyRequests.length > 0 ? ' avatar-online' : ''}`}
-			>
-				<div class="bg-neutral text-neutral-content w-10 rounded-full">
-					<span class="text-xl">{user.name.charAt(0).toUpperCase()}</span>
-				</div>
+			<div tabindex="0" data-testid="headerAvatar" role="button">
+				<Avatar {user} isOnline={moneyRequests.length > 0} />
 			</div>
 			<ul
 				tabindex="0"
 				class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
 			>
-				<li><a data-testid="headerChangeName" href="/name">Change Name</a></li>
+				<li><a data-testid="headerChangeName" href="/name">Change Name and Avatar</a></li>
 				{#if user.isAdmin}
 					<li>
 						<button onclick={() => resetDialog.show()}> Reset room </button>
+					</li>
+				{/if}
+				{#if user.googleId && user.isAdmin}
+					<li>
+						<button onclick={() => logout()}>Logout</button>
 					</li>
 				{/if}
 				{#if areMoneyRequestsVisible && (appState === AppState.NoRound || appState === AppState.RoundEnded)}

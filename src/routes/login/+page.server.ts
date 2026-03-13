@@ -13,12 +13,17 @@ export const actions = {
         }
         const data = await request.formData()
         const username = data.get('username')
-        const room = data.get('room')
         if (!username || username instanceof File || username.length == 0) {
             return fail(400, { error: "username is missing" });
         }
+
+        const room = data.get('room')
         if (!room || room instanceof File || room.length == 0) {
             return fail(400, { error: "room is missing" });
+        }
+        var avatarUrl = data.get("avatarUrl")
+        if (!avatarUrl || avatarUrl instanceof File || avatarUrl.length == 0) {
+            avatarUrl = null;
         }
         const env = platform?.env
         let user;
@@ -26,8 +31,8 @@ export const actions = {
         if (!roomFromDb) {
             return fail(400, { error: "room not found" });
         }
-        user = await createUser(env, username, roomFromDb.id, roomFromDb.defaultMoney)
-        
+        user = await createUser(env, username, roomFromDb.id, roomFromDb.defaultMoney, avatarUrl)
+
         // In dev mode, names starting with admin_ become admins automatically for testing
         if (dev && username.startsWith("admin_")) {
             const { setUserAdmin } = await import('$lib/server/db/user');

@@ -7,7 +7,8 @@ export const user = sqliteTable('user', {
 	googleId: text("google_id"),
 	roomId: integer("room_id").references(() => room.id),
 	isAdmin: integer("is_admin", { mode: "boolean" }).notNull().default(false), // 0 - false , 1 - true
-	money: real().notNull().default(DEFAULT_MONEY)
+	money: real().notNull().default(DEFAULT_MONEY),
+	avatarUrl: text()
 });
 
 export const room = sqliteTable('room', {

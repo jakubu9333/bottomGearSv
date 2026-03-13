@@ -14,7 +14,7 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
         await admin_page.getByPlaceholder("Meno roomky").fill("test_pre_botov")
         await admin_page.getByRole("button", { name: "Prihlásiť sa", exact: true }).click()
         await expect(admin_page).toHaveURL(/\/room/)
-        
+
         await admin_page.waitForTimeout(1000);
 
         await admin_page.goto(`/admin/room`)
@@ -39,7 +39,7 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
 
         expect(admin_req.ok()).toBe(true)
         const duel = await admin_req.json()
-        
+
         return { roomName, roomId, admin_token, admin_page, admin_context, duel }
     }
 
@@ -50,7 +50,7 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
         await page.goto(`/login`)
         await page.getByPlaceholder("Prihlasovacie meno").fill(bot_name)
         await page.getByPlaceholder("Meno roomky").fill(roomName)
-        
+
         const openPromise = page.waitForEvent('console', {
             filter: msg => msg.text() === 'open',
             timeout: 10000
@@ -59,7 +59,7 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
         await page.getByRole("button", { name: "Prihlásiť sa", exact: true }).click()
         await expect(page).toHaveURL(/\/room/)
         await openPromise;
-        
+
         // extra wait to ensure socket is registered in DO
         await page.waitForTimeout(1000);
 
@@ -71,12 +71,12 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
     test('Edge Case: Bet with 0 amount should be rejected or have no effect', async ({ browser }) => {
         const { roomName, admin_context } = await getRoomIntoBetting(browser)
         const { page, context } = await joinRoom(browser, roomName)
-        
+
         const moneyInput = page.getByTestId("moneyInput")
         await moneyInput.fill("0")
         await page.getByTestId("duelBtn_0").click()
         await expect(page.getByTestId("zeroWarning")).toBeVisible()
-        
+
         await context.close()
         await admin_context.close()
     });
@@ -84,13 +84,13 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
     test('Edge Case: Bet with negative amount should be rejected', async ({ browser }) => {
         const { roomName, admin_context } = await getRoomIntoBetting(browser)
         const { page, context } = await joinRoom(browser, roomName)
-        
+
         const moneyInput = page.getByTestId("moneyInput")
         await moneyInput.fill("-10")
         await page.waitForTimeout(500)
         await page.getByTestId("duelBtn_0").click()
         await expect(page.getByTestId("zeroWarning")).toBeVisible()
-        
+
         await context.close()
         await admin_context.close()
     });
@@ -98,13 +98,13 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
     test('Edge Case: Bet more than the current balance should be rejected', async ({ browser }) => {
         const { roomName, admin_context } = await getRoomIntoBetting(browser)
         const { page, context } = await joinRoom(browser, roomName)
-        
+
         const moneyInput = page.getByTestId("moneyInput")
         await moneyInput.fill("500")
         await page.waitForTimeout(500)
         const val = await moneyInput.inputValue()
         expect(Number(val)).toBeLessThanOrEqual(250)
-        
+
         await context.close()
         await admin_context.close()
     });
@@ -112,12 +112,12 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
     test('Edge Case: Bet with a non-numeric value in the amount field', async ({ browser }) => {
         const { roomName, admin_context } = await getRoomIntoBetting(browser)
         const { page, context } = await joinRoom(browser, roomName)
-        
+
         const moneyInput = page.getByTestId("moneyInput")
         await moneyInput.type("abc")
         const val = await moneyInput.inputValue()
         expect(Number(val) === 0 || val === "" || isNaN(Number(val))).toBe(true)
-        
+
         await context.close()
         await admin_context.close()
     });
@@ -146,14 +146,14 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
         const finalMoneyText = await page.getByText(/^Tvoj zostatok:/).first().innerText()
         const finalMoney = parseInt(finalMoneyText.match(/\d+/)?.[0] || "0")
         expect(finalMoney).toBe(initialMoney)
-        
+
         await context.close()
         await admin_context.close()
     });
 
     test('Multiple users placing bets concurrently updates the pool and ratios correctly', async ({ browser }) => {
         const { roomName, admin_context } = await getRoomIntoBetting(browser)
-        
+
         const { page: bot1Page, context: bot1Context } = await joinRoom(browser, roomName)
         const { page: bot2Page, context: bot2Context } = await joinRoom(browser, roomName)
 
@@ -183,7 +183,7 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
 
         await expect(page.getByText("Stávka úspešne prijatá")).toBeVisible()
         await expect(page.getByText(`${initialMoney - 50} 🪙`)).toBeVisible()
-        
+
         await context.close()
         await admin_context.close()
     });
@@ -207,11 +207,14 @@ test.describe.serial('Betting Functionality and Edge Cases', () => {
         await page.goto("/room")
         await expect(page.getByText("Stávka úspešne prijatá")).toBeVisible()
         await expect(page.getByTestId("headerAvatar")).toHaveText("N")
-        
+
         await context.close()
         await admin_context.close()
     });
 
     test.skip('Edge Case: Betting after the duel has been started/locked should be rejected', async ({ page }) => {
+    });
+
+    test.skip('Edge Case: bet is not reseted when user skip the stages', async ({ page }) => {
     });
 });

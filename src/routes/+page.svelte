@@ -131,7 +131,7 @@
 				<div class="card-body">
 					<h2 class="card-title">Actions</h2>
 					<div class="flex flex-col gap-2">
-						<a href="/name" class="btn btn-neutral w-full">Update Profile Name</a>
+						<a href="/name" class="btn btn-neutral w-full">Update Profile Name and Avatar</a>
 
 						{#if isAdmin}
 							<div class="divider">Admin Zone</div>
