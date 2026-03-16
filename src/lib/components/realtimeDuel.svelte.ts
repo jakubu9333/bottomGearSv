@@ -44,6 +44,10 @@ export class RealtimeDuel {
     return this.isBetted.value
   }
 
+  getDuelId = () => {
+    return this.duel.value.id
+  }
+
   resetBet = () => {
     const defaultBetItem = {
       name: '',

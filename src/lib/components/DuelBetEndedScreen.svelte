@@ -1,7 +1,19 @@
 <script lang="ts">
 	import type { RealtimeDuel } from '$lib/components/realtimeDuel.svelte';
+	import { AppState, type User } from '$lib/types';
 
-	let { betDataHolder }: { betDataHolder: RealtimeDuel } = $props();
+	let {
+		betDataHolder,
+		user,
+		roomState = $bindable()
+	}: { betDataHolder: RealtimeDuel; user: User; roomState: AppState } = $props();
+	let error = $state('');
+	async function resetBet() {
+		const reset = await fetch(`admin/duel/${betDataHolder.getDuelId()}/reset`, { method: 'POST' });
+		if (!reset.ok) {
+			error = await reset.json().then((e) => e.message);
+		}
+	}
 </script>
 
 <div class="flex flex-col items-center space-y-6 text-center">
@@ -43,5 +55,11 @@
 			<span class="loading loading-dots loading-xs"></span>
 			Prebieha vyhodnocovanie kola
 		</p>
+	{/if}
+	{#if user.isAdmin && roomState == AppState.DuelBetEnded}
+		{#if error.length > 0}
+			<span class="alert alert-error">{error}</span>
+		{/if}
+		<button class="btn btn-error" onclick={() => resetBet()}>Resetovat stavku</button>
 	{/if}
 </div>

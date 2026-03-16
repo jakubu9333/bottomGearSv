@@ -144,7 +144,7 @@
 							setBetItem={betDataHolder.addMybet}
 						/>
 					{:else if derivedAppState === AppState.DuelBetEnded}
-						<DuelBetEndedScreen {betDataHolder} />
+						<DuelBetEndedScreen {betDataHolder} {user} bind:roomState />
 					{:else if roomState === AppState.RoundEnded}
 						<RoundEndedScreen
 							bind:money

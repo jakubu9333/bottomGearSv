@@ -1,4 +1,4 @@
-import { eq, sum, sql } from "drizzle-orm"
+import { eq, sum, sql, inArray, exists } from "drizzle-orm"
 import { db } from "."
 import { duelBet, user } from "./schema"
 
@@ -16,6 +16,22 @@ export const createNewBet = async (env: Env, money: number, winner: string, duel
 export const getAllBetMoneyForDuel = async (env: Env, duelId: number) => {
   const duels = (await db(env).select({ winner: duelBet.winner, money: sum(duelBet.money) }).from(duelBet).where(eq(duelBet.duelId, duelId)).groupBy(duelBet.winner))
   return duels
+}
+
+export const resetBet = async (env: Env, duelId: number) => {
+  const dbEnv = db(env)
+  const resetedBet = await dbEnv.run(sql`
+   UPDATE ${user}
+   SET money = ${user.money} + betters.money
+   FROM (
+      SELECT ${duelBet.userId} as userId, ${duelBet.money} as money 
+     FROM ${duelBet} 
+     WHERE ${duelBet.duelId} = ${duelId}
+    ) AS betters
+    WHERE ${user.id} = betters.userId
+  `);
+
+  return resetedBet
 }
 
 export const setWinnerMoney = async (env: Env, duelId: number, winner: string) => {
