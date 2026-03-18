@@ -54,7 +54,7 @@
 		setDuel(duelData);
 	});
 	let participants: DuelParticipant[] = $state([]);
-	let errorLook = $state(false);
+	let errorLook = $state('');
 	let moneyWarning = $state(false);
 
 	async function duelBet(winnerIndex: number | undefined) {
@@ -72,7 +72,7 @@
 		} else {
 			winner = duel.value.secondName;
 		}
-		errorLook = false;
+		errorLook = '';
 		const betResponse = await fetch('/me/bet', {
 			method: 'post',
 			body: JSON.stringify({
@@ -81,8 +81,8 @@
 				money: moneyToBet
 			})
 		});
-		if (betResponse.status >= 300) {
-			errorLook = true;
+		if (!betResponse.ok) {
+			errorLook = await betResponse.json().then((e) => e.message);
 			return;
 		}
 		setBetItem(moneyToBet, winner);
@@ -100,9 +100,9 @@
 		</h2>
 	</div>
 
-	{#if errorLook}
+	{#if errorLook.length > 0}
 		<div class="alert alert-error py-2 shadow-sm">
-			<span>Chyba pri spracovaní. Skús to znova.</span>
+			<span>{errorLook}</span>
 		</div>
 	{/if}
 	{#if moneyWarning}

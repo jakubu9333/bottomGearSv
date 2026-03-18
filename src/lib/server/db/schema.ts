@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { sqliteTable, integer, text, real } from 'drizzle-orm/sqlite-core';
+import { sqliteTable, integer, text, real, uniqueIndex } from 'drizzle-orm/sqlite-core';
 const DEFAULT_MONEY = 250
 export const user = sqliteTable('user', {
 	id: integer('id').primaryKey({ autoIncrement: true }),
@@ -35,7 +35,12 @@ export const duelBet = sqliteTable('duelBet', {
 	money: real().notNull(),
 	duelId: integer("duel_id").notNull().references(() => duel.id),
 	userId: integer("user_id").notNull().references(() => user.id)
-})
+}, (table) => {
+	return {
+		uniq: uniqueIndex("one_bet_per_duel").on(table.duelId, table.userId)
+	}
+}
+)
 
 export const moneyRequest = sqliteTable('moneyRequest', {
 	id: integer('id').primaryKey({ autoIncrement: true }),

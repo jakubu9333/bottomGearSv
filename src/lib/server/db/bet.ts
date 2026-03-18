@@ -1,4 +1,4 @@
-import { eq, sum, sql, inArray, exists } from "drizzle-orm"
+import { eq, sum, sql } from "drizzle-orm"
 import { db } from "."
 import { duelBet, user } from "./schema"
 
@@ -10,7 +10,7 @@ export const createNewBet = async (env: Env, money: number, winner: string, duel
     winner,
     duelId,
     userId
-  }).returning())[0]
+  }).onConflictDoNothing().returning())[0]
 }
 
 export const getAllBetMoneyForDuel = async (env: Env, duelId: number) => {
