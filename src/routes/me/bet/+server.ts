@@ -1,9 +1,10 @@
 import { createNewBet } from "$lib/server/db/bet";
 import { getUser } from "$lib/server/db/user";
-import { getDuelById } from "$lib/server/db/duel";
+import { getBettableDuelById } from "$lib/server/db/duel";
 import { removeUserMoney } from "$lib/server/db/user";
 import type { RequestHandler } from "@sveltejs/kit";
 import { sendSocketMessage } from "$lib/server/durrable";
+import { IsBettable } from "$lib/types";
 
 
 type Bet = { winner: string, money: number, duelId: number }
@@ -24,8 +25,8 @@ export const POST: RequestHandler = async ({ request, locals, platform }) => {
             status: 400
         })
     }
-    const isDuelBettable = (await getDuelById(env, betFromJson.duelId)).isBettable === 1
-    if (!isDuelBettable) {
+    const bettableDuel = await getBettableDuelById(env, betFromJson.duelId)
+    if (!bettableDuel) {
         return Response.json({ desc: "duel is not bettable" }, { status: 400 })
     }
     const bet = createNewBet(env,
