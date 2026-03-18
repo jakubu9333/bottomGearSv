@@ -16,7 +16,10 @@ export const POST: RequestHandler = async ({ platform, locals, params, request }
 	if (!winner.winner) {
 		return new Response(JSON.stringify({ message: "winner not set" }), { status: 400 })
 	}
-	await setWinner(env, +params.duelId, winner.winner)
+	const updatedDuel = await setWinner(env, +params.duelId, winner.winner)
+	if (!updatedDuel) {
+		return Response.json({ message: "Duel not found or already ended" }, { status: 400 })
+	}
 	const users = await setWinnerMoney(env, +params.duelId, winner.winner)
 	await giveFreeMoneyToBrokeBoys(env, room.id)
 	const eventToSend = EventType.RoundEnd

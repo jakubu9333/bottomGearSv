@@ -4,6 +4,7 @@ import { endDuelRoundInRoom } from "$lib/server/db/room";
 import { sendSocketMessage } from "$lib/server/durrable";
 import { json, error, type RequestHandler } from "@sveltejs/kit";
 import { resetBet } from "$lib/server/db/bet";
+import { resetDuelStatus } from "$lib/server/db/duel";
 
 
 export const POST: RequestHandler = async ({ params, locals, platform }) => {
@@ -11,6 +12,10 @@ export const POST: RequestHandler = async ({ params, locals, platform }) => {
 	const room = await endDuelRoundInRoom(env, locals.userId)
 	if (!room) {
 		return error(400, { message: "User not in a room" })
+	}
+	const updatedDuel = await resetDuelStatus(env, +params.duelId)
+	if (!updatedDuel) {
+		return error(400, { message: "Duel not found or already ended" })
 	}
 	const resetedBets = resetBet(env, +params.duelId)
 	const eventToSend = EventType.RoundEnd

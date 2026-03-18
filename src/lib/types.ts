@@ -37,6 +37,12 @@ export enum MessageType {
 	MoneyUpdate = 'money_update',
 }
 
+export enum IsBettable {
+	YES = 1,
+	NO = 0,
+	DUEL_ENDED = 2
+}
+
 export type SocketMessage =
 	| { type: MessageType.Event; event: EventType }
 	| { type: MessageType.Bet; money: number; winner: string }
